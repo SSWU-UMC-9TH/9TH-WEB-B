@@ -131,9 +131,16 @@ body {
     padding: 10px;
 }
 
-
 .render-container__item-button {
     color: #ffffff;
     border: none;
     border-radius: 5px;
+}
+
+.btn-complete {
+    background-color: #28e745;
+}
+
+.btn-delete {
+    background-color: #dc3545;
 }

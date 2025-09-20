@@ -42,11 +42,11 @@ const createTodoElement = (todo, isDone) => {
     button.classList.add('render-container__item-button');
     if (isDone) {
         button.textContent = '삭제';
-        button.style.backgroundColor = '#dc3545';
+        button.classList.add('btn-delete');
     }
     else {
         button.textContent = '완료';
-        button.style.backgroundColor = '#28e745';
+        button.classList.add('btn-complete');
     }
     button.addEventListener('click', () => {
         if (isDone) {

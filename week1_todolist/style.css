@@ -1,0 +1,139 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+    box-sizing: border-box;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+    box-sizing: border-box;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+input {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: rgb(243, 255, 245);
+}
+
+.todo-container {
+    padding: 20px 10px 10px 10px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.todo-container__title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.todo-container__form {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.todo-container__input {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid gray;
+    width: 350px;
+}
+
+.todo-container__button {
+    background-color: rgb(80, 191, 76);
+    padding: 10px;
+    border-radius: 10px;
+    color: #ffffff;
+    border: none;
+}
+
+.render-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.render-container__section {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px 10px;
+}
+
+.render-container__title {
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+}
+
+.render-container__list {
+    width: 90%;
+}
+
+.render-container__item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+    margin-bottom: 3px;
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+
+.render-container__item-button {
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+}

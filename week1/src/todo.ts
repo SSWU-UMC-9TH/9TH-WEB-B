@@ -31,7 +31,7 @@ const getTodoText = (): string => {
 };
 
 const addTodo = (text: string): void => {
-    todos.push({ id: Date.now(), text: text });
+    todos.push({ id: Date.now(), text });
     todoInput.value = '';
     renderTasks();
 };

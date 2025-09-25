@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useTodo } from "../context/TodoContext";
 
-const TodoForm = (): Element => {
+const TodoForm = () => {
     const [input, setInput] = useState<string>('');
     const {addTodo} = useTodo();
 

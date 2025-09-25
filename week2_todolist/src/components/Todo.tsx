@@ -2,7 +2,7 @@ import TodoForm from './TodoForm.tsx';
 import TodoList from './TodoList.tsx';
 import { useTodo } from '../context/TodoContext.tsx';
 
-const Todo = (): Element => {
+const Todo = () => {
     const {todos, completeTodo, deleteTodo, doneTodos} = useTodo();
 
     return (

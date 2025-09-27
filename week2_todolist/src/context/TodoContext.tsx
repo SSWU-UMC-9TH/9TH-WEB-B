@@ -36,7 +36,7 @@ export const TodoProvider = ({children}: PropsWithChildren): Element => {
     )
 };
 
-export const useTodo = (): void => {
+export const useTodo = (): ITodoContext => {
     const context = useContext(TodoContext);
     // context가 없는 경우
     if (!context) {

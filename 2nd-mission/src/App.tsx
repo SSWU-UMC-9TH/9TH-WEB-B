@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react';
 import type { TTodo } from './types/todo.ts';
 import Todo from './components/Todo.tsx';
 
+
 export default function App() {
   const [todos, setTodos] = useState<TTodo[]>([{ id: 1, text: '맛있다.' }]);
   const [doneTodos, setDoneTodos] = useState<TTodo[]>([{ id: 2, text: '오타니' }]);
@@ -35,7 +36,9 @@ export default function App() {
         doneTodos={doneTodos}
         completeTodo={completeTodo}
         deleteTodo={deleteTodo}
+        
       />
     </div>
+    
   );
 }

@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { LoadingSpinner } from "../components/LoadingSpinner";
-import profile from '../assets/profile.png';
+import { CreditProfile } from "../components/CreditProfile";
 import type { Credits, Movie } from "../movie";
 
 const MovieDetailPage = () => {
@@ -100,28 +100,8 @@ const MovieDetailPage = () => {
                     <div>
                         <h1 className="text-[30px] font-bold mt-[15px] text-white">감독/출연</h1>
                         <div className="p-10 grid gap-4 grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
-                            {credits.cast.map((credit) => (
-                                <div className="flex flex-col items-center"> 
-                                    <img 
-                                        className="w-[100px] aspect-square object-cover rounded-full border-[2px] border-white text-white"
-                                        src={credit.profile_path!=null ? `https://image.tmdb.org/t/p/original${credit.profile_path}` : profile}  
-                                        alt={`${credit.original_name}의 프로필 사진`}
-                                    />
-                                    <h4 className="text-white font-bold text-center">{credit.original_name}</h4>
-                                    <p className="text-gray-500 text-center">{credit.known_for_department}</p>
-                                </div>
-                            ))}
-                            {credits.crew.map((credit) => (
-                                <div className="flex flex-col items-center"> 
-                                    <img 
-                                        className="w-[100px] aspect-square object-cover rounded-full border-[2px] border-white text-white"
-                                        src={credit.profile_path!=null ? `https://image.tmdb.org/t/p/original${credit.profile_path}` : profile}  
-                                        alt={`${credit.original_name}의 프로필 사진`}
-                                    />
-                                    <h4 className="text-white font-bold text-center">{credit.original_name}</h4>
-                                    <p className="text-gray-500 text-center">{credit.known_for_department}</p>
-                                </div>
-                            ))}
+                            <CreditProfile credits={credits.cast}/>
+                            <CreditProfile credits={credits.crew}/>
                         </div>
                     </div>
                 </div>

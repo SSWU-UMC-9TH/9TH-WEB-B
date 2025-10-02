@@ -13,6 +13,7 @@ node_modules
 # Build outputs
 dist
 dist-ssr
+*.local
 
 # Local env files
 .env
@@ -29,6 +30,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Others
-.eslintcache

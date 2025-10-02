@@ -4,7 +4,13 @@ import axios from "axios";
 import type { Cast, Crew, MovieDetail } from "../types/movie";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 
-
+const api = axios.create({
+  baseURL: "https://api.themoviedb.org/3",
+  headers: {
+    accept: "application/json",
+    Authorization: `Bearer ${import.meta.env.VITE_TMOB_KEY}`,
+  },
+});
 
 const MovieDetailPage = () => {
   const { movieId } = useParams<{ movieId: string }>();
@@ -18,26 +24,11 @@ const MovieDetailPage = () => {
     const fetchMovieDetail = async () => {
       try {
         setIsLoading(true);
-        const { data } = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movieId}?language=en-US`,
-          {
-            headers: {
-              accept: "application/json",
-              Authorization: `Bearer ${import.meta.env.VITE_TMOB_KEY}`, 
-            },
-          }
-        );
-        setMovie(data);
-
-        const creditsRes = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movieId}/credits?language=en-US`,
-          {
-            headers: {
-              accept: "application/json",
-              Authorization: `Bearer ${import.meta.env.VITE_TMOB_KEY}`,
-            },
-          }
-        );
+        const [movieRes, creditsRes] = await Promise.all([
+          api.get(`/movie/${movieId}?language=en-US`),
+          api.get(`/movie/${movieId}/credits?language=en-US`),
+        ]);
+        setMovie(movieRes.data);
         setCast(creditsRes.data.cast);
         setCrew(creditsRes.data.crew);
       } catch (err) {

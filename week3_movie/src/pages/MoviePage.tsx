@@ -27,6 +27,7 @@ export default function MoviePage() {
                         }
                     }
                 );
+                console.log('클릭함', params.category);
                 setMovies(data.results);
             } catch {
                 setIsError(true);
@@ -35,7 +36,11 @@ export default function MoviePage() {
             }
         }
         fetchMovies();
-    }, [page])
+    }, [params.category, page])
+
+    useEffect(() => {
+        setPage(1);
+    }, [params.category])
 
     if (isError) {
         return (

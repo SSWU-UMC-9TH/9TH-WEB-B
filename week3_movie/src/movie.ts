@@ -13,6 +13,8 @@ export type Movie = {
     video: boolean;
     vote_average: number;
     vote_count: number;
+    runtime: number;
+    tagline: string;
 }
 
 export type MovieResponse = {
@@ -20,4 +22,24 @@ export type MovieResponse = {
     results: Movie[];
     totalPages: number;
     total_results: number;
+}
+
+export type Credit = {
+    adult: boolean;
+    cast_id: number;
+    character: string;
+    credit_id: string;
+    gender: number;
+    id: number;
+    known_for_department: string;
+    name: string;
+    order: number;
+    original_name: string;
+    popularity: number;
+    profile_path: string;
+}
+
+export type Credits = {
+    cast: Credit[];
+    crew: Credit[];
 }

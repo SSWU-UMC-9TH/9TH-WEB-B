@@ -6,7 +6,6 @@ const LINKS = [
     { to: '/movies/now_playing', label: '상영 중'},
     { to: '/movies/top_rated', label: '평점 높은'},
     { to: '/movies/upcoming', label: '개봉 예정'},
-
 ]
 
 export const Navbar = () => {
@@ -19,7 +18,6 @@ export const Navbar = () => {
                     className={({isActive}) => {
                         return isActive ? 'text-[#b2dab1] font-bold' : 'text-gray-500';
                     }}
-                     
                 >
                     {label}
                 </NavLink>

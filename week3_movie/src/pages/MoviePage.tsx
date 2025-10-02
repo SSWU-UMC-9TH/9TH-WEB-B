@@ -13,6 +13,11 @@ export default function MoviePage() {
 
   const { category } = useParams<{ category: string }>();
 
+  // 카테고리가 변경될 때 페이지를 1로 초기화
+  useEffect(() => {
+    setPage(1);
+  }, [category]);
+
   useEffect(() => {
     const fetchMovies = async () => {
       setIsPending(true); // 로딩 시작

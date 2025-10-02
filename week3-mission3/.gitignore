@@ -32,3 +32,4 @@ dist-ssr
 
 # Others
 .eslintcache
+.DS_Store

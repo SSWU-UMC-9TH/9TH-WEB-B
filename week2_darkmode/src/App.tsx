@@ -1,6 +1,10 @@
 import ContextPage from './useContext/ContextPage';
-import './index.css';
+import './App.css';
 
-export default function App() {
-  return <ContextPage />;
+export default function App()  {
+  return (
+    <>
+      <ContextPage />
+    </>
+  )
 }

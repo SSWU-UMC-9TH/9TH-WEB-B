@@ -1,13 +1,21 @@
-import ThemeToggleButton from '../context/ThemeToggleButton';
-import { useTheme } from '../context/ThemeProvider';
+import clsx from "clsx";
+import { THEME, useTheme } from "../context/ThemeProvider";
+import ThemeToggleButton from "./ThemeToggleButton";
+
 
 export default function Navbar() {
-  const { theme } = useTheme();
-  console.log('현재 테마:', theme);
+    const { theme, toggleTheme } = useTheme();
 
-  return (
-    <div className="p-4 flex justify-end">
-      <ThemeToggleButton />
-    </div>
-  );
+    const isLightMode = theme === THEME.LIGHT;
+
+    return (
+        <nav
+            className={clsx(
+                'p-4 w-full flex justify-end',
+                isLightMode ? 'bg-white' : 'bg-gray-800'
+            )}
+        >
+            <ThemeToggleButton />
+        </nav>
+    )
 }

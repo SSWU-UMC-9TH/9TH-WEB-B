@@ -1,6 +1,7 @@
+// MovieDetailPage.tsx (요청 취소 + 에러 메시지 개선 + setIsPending 정리)
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 type MovieDetails = {
   id: number;
@@ -24,7 +25,7 @@ type Credits = {
   crew: Array<{
     id: number;
     name: string;
-    job?: string; 
+    job?: string;
     profile_path?: string;
   }>;
 };
@@ -41,7 +42,7 @@ const IMG = {
 const TMDB_TOKEN = import.meta.env.VITE_TMDB_KEY as string;
 
 export default function MovieDetailPage() {
-  const { id, category } = useParams<{ id: string; category: string }>(); // category는 UI용, 호출은 id만 사용
+  const { id, category } = useParams<{ id: string; category: string }>();
   const [detail, setDetail] = useState<MovieDetails | null>(null);
   const [credits, setCredits] = useState<Credits | null>(null);
   const [isPending, setIsPending] = useState(false);
@@ -49,6 +50,7 @@ export default function MovieDetailPage() {
 
   useEffect(() => {
     if (!id) return;
+    const controller = new AbortController();
 
     const fetchAll = async () => {
       setIsPending(true);
@@ -59,24 +61,32 @@ export default function MovieDetailPage() {
         const [dRes, cRes] = await Promise.all([
           axios.get<MovieDetails>(
             `https://api.themoviedb.org/3/movie/${id}?language=ko-KR`,
-            { headers }
+            { headers, signal: controller.signal } 
           ),
           axios.get<Credits>(
             `https://api.themoviedb.org/3/movie/${id}/credits?language=ko-KR`,
-            { headers }
+            { headers, signal: controller.signal } 
           ),
         ]);
 
         setDetail(dRes.data);
         setCredits(cRes.data);
-      } catch (e: any) {
-        setError(e?.message ?? '에러가 발생했습니다.');
+      } catch (e) {
+        if (axios.isCancel(e)) return; 
+        const ae = e as AxiosError<any>;
+        const status = ae.response?.status;
+        const msg =
+          (ae.response?.data && (ae.response.data.status_message || ae.message)) ||
+          ae.message ||
+          '에러가 발생했습니다.';
+        setError(status ? `HTTP ${status} · ${msg}` : msg); 
       } finally {
-        setIsPending(false);
+        setIsPending(false); 
       }
     };
 
     fetchAll();
+    return () => controller.abort();
   }, [id]);
 
   if (isPending) {
@@ -88,14 +98,13 @@ export default function MovieDetailPage() {
   }
 
   if (isError) {
-    return <div className="text-red-500 text-2xl p-6">에러가 발생했습니다.</div>;
+    return <div className="text-red-500 text-2xl p-6">{isError}</div>;
   }
 
   if (!detail) return null;
 
-  
   const directors = (credits?.crew ?? []).filter(p => p.job === 'Director');
-  const cast = (credits?.cast ?? []).slice(0, 12); // 상단 12명만
+  const cast = (credits?.cast ?? []).slice(0, 12);
 
   const minutesToHMM = (m?: number) => {
     if (!m && m !== 0) return '';
@@ -107,9 +116,7 @@ export default function MovieDetailPage() {
   return (
     <div className="text-white">
       
-      <div
-        className="relative h-[340px] md:h-[420px] lg:h-[520px] overflow-hidden rounded-xl mx-4 md:mx-6 lg:mx-10 mt-4"
-      >
+      <div className="relative h-[340px] md:h-[420px] lg:h-[520px] overflow-hidden rounded-xl mx-4 md:mx-6 lg:mx-10 mt-4">
         {detail.backdrop_path && (
           <img
             src={IMG.backdrop(detail.backdrop_path)}
@@ -133,10 +140,7 @@ export default function MovieDetailPage() {
           {detail.genres && detail.genres.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3">
               {detail.genres.map(g => (
-                <span
-                  key={g.id}
-                  className="text-xs bg-white/15 px-2 py-1 rounded-full"
-                >
+                <span key={g.id} className="text-xs bg-white/15 px-2 py-1 rounded-full">
                   {g.name}
                 </span>
               ))}
@@ -149,7 +153,6 @@ export default function MovieDetailPage() {
       <div className="mx-4 md:mx-6 lg:mx-10 my-6">
         <h2 className="text-xl md:text-2xl font-bold mb-4">감독/출연</h2>
 
-        
         {directors.length > 0 && (
           <div className="mb-4 flex gap-4 overflow-x-auto pb-2">
             {directors.map(d => (
@@ -170,7 +173,6 @@ export default function MovieDetailPage() {
           </div>
         )}
 
-       
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
           {cast.map(p => (
             <div key={p.id} className="text-center">
@@ -191,12 +193,8 @@ export default function MovieDetailPage() {
           ))}
         </div>
 
-        
         <div className="mt-8">
-          <Link
-            to={`/movies/${category}`}
-            className="text-sm text-[#b2dab1] hover:underline"
-          >
+          <Link to={`/movies/${category}`} className="text-sm text-[#b2dab1] hover:underline">
             ← 목록으로
           </Link>
         </div>

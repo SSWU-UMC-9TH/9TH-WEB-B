@@ -1,7 +1,7 @@
 import {ChangeEvent, useEffect, useState} from 'react';
 
 interface UseFormProps<T>{
-    initialValue: T; //값이 올바른지 검증
+    initialValue: T; // 값이 올바른지 검증
     validate: (values: T) => Record<keyof T, string>;
 };
 

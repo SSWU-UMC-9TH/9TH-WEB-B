@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+/* 전역 배경색 설정 */
+html, body {
+  background-color: #000000;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  min-height: 100vh;
+  background-color: #000000;
+}

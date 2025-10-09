@@ -7,13 +7,18 @@ const Navbar = () => {
         navigate('/login');
     };
 
+    const handlehome = () => {
+        navigate('/');
+    };
+
     const handleSignup = () => {
         navigate('/signup');
     };
 
     return (
-        <nav className="flex items-center justify-between h-16 bg-gray-900 border-b border-gray-700 px-6">
-            <div className="text-lg font-semibold text-white">
+        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-16 bg-gray/70 backdrop-blur-md px-6">
+            <div className="text-lg font-semibold text-white cursor-pointer"
+            onClick = {handlehome}>
                 돌려돌려 LP판
             </div>
             <div className="flex gap-4">

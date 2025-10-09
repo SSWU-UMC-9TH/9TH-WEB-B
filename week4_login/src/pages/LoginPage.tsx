@@ -30,7 +30,7 @@ const LoginPage = () => {
                     <button className="text-lg cursor-pointer text-white"
                     onClick={() => navigate("/")}>
                     &lt; </button>
-                    <div className="text-lg text-white">
+                    <div className="text-xl font-semibold text-white pb-2 pr-3">
                     로그인
                     </div>
                     <div className="blank">
@@ -53,9 +53,9 @@ const LoginPage = () => {
                 {errors?.password && touched?.password && (<div className="text-red-500 text-sm">{errors.password}</div>)}
                 <button
                     type='button' onClick={handleSubmit} disabled={isDisabled}
-                    className={`w-full py-3 rounded-md text-lg font-semibold transition-all duration-200 ${isDisabled
+                    className={`w-full py-2 rounded-md text-lg font-semibold transition-all duration-200 ${isDisabled
                             ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-50"
-                            : "bg-yellow-400 text-white hover:bg-yellow-500 active:bg-yellow-500 shadow-lg hover:shadow-xl"}`}
+                            : "bg-pink-400 text-white hover:bg-pink-300 active:bg-pink-500 shadow-lg hover:shadow-xl cursor-pointer"}`}
                 >로그인</button>
             </div>
         </div>

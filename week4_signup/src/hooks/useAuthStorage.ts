@@ -1,8 +1,9 @@
-// 인증 관리 전용 훅
-// useLocalStorage 기반으로 토큰을 안전하게 관리
+// 토큰 관리 전용 훅 (유틸리티 역할)
+// useLocalStorage 기반으로 토큰 CRUD 기능만 담당
+// 인증 로직(저장, 삭제, 가져오기)을 “유틸리티”처럼 제공
 import { useLocalStorage } from './useLocalStorage';
 
-export const useAuth = () => {
+export const useAuthStorage = () => {
     const accessTokenStorage = useLocalStorage('accessToken');
     const refreshTokenStorage = useLocalStorage('refreshToken');
 
@@ -15,16 +16,6 @@ export const useAuth = () => {
         window.dispatchEvent(new Event('storage'));
     };
 
-    // 액세스 토큰 가져오기
-    const getAccessToken = () => {
-        return accessTokenStorage.getItem();
-    };
-
-    // 리프레시 토큰 가져오기
-    const getRefreshToken = () => {
-        return refreshTokenStorage.getItem();
-    };
-
     // 토큰 제거 (로그아웃)
     const clearTokens = () => {
         accessTokenStorage.removeItem();
@@ -34,17 +25,10 @@ export const useAuth = () => {
         window.dispatchEvent(new Event('storage'));
     };
 
-    // 로그인 상태
-    const isAuthenticated = () => {
-        const token = getAccessToken();
-        return !!token;
-    };
-
     return {
-        saveTokens,         
-        getAccessToken,     
-        getRefreshToken,               
-        clearTokens,        
-        isAuthenticated,    
+        saveTokens,
+        getAccessToken: () => accessTokenStorage.getItem(),
+        getRefreshToken: () => refreshTokenStorage.getItem(),
+        clearTokens,
     };
 };

@@ -3,7 +3,7 @@ import { postSignin } from '../apis/auth';
 import { RequestSigninDto } from '../types/auth';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthStorage } from '../hooks/useAuthStorage';
 
 interface LoginFormData {
     email: string;
@@ -13,7 +13,7 @@ interface LoginFormData {
 const LoginPage = () => {  
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-    const { saveTokens } = useAuth();
+    const { saveTokens } = useAuthStorage();
 
     const {
         register,

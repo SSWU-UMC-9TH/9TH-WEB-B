@@ -2,19 +2,19 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyInfo, postLogout } from '../apis/auth';
 import { ResponseMyInfoDto } from '../types/auth';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthStorage } from '../hooks/useAuthStorage';
 
 const MyPage = () => {
     const navigate = useNavigate();
     const [userInfo, setUserInfo] = useState<ResponseMyInfoDto['data'] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isLogoutLoading, setIsLogoutLoading] = useState(false);
-    const { isAuthenticated, clearTokens } = useAuth();
+    const { getAccessToken, clearTokens } = useAuthStorage();
 
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                if (!isAuthenticated()) {
+                if (!getAccessToken()) {
                     alert('로그인이 필요합니다.');
                     navigate('/login');
                     return;

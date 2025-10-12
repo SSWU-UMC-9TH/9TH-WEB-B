@@ -1,8 +1,8 @@
 import axios from "axios";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthStorage } from "../hooks/useAuthStorage";
 
 // useAuth 훅을 사용한 토큰 관리
-const auth = useAuth();
+const auth = useAuthStorage();
 
 export const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_SERVER_API_URL, 

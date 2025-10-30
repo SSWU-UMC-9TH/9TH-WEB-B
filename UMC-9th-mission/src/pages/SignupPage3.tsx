@@ -22,7 +22,7 @@ const SignupPage3 = () => {
             name: "",
         },
         resolver: zodResolver(schema),
-        mode: "onBlur",
+        mode: "onChange",
     })
 
     const onSubmit: SubmitHandler<FormFields> = async(data) => {
@@ -67,7 +67,7 @@ const SignupPage3 = () => {
                     {...register("name")}
                     className={`border border-[#ccc] w-[300px] p-[10px] focus:border-[#807bff] rounded-sm placeholder:text-[#ccc] text-[#ccc] bg-[#1b1b1b]
                     ${errors?.name ? "border-red-500" : "border-gray-300"}`}
-                    type="name" 
+                    type="text" 
                     placeholder='이름을 입력해주세요!'
                 />
                 {errors.name && (

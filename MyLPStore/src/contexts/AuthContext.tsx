@@ -1,5 +1,5 @@
 // Context API로 전역 상태 관리 - 상태 중앙화: 앱 전체의 인증 상태를 하나의 소스로 관리
-//로그인 여부(isLoggedIn)를 useState로 들고 있음
+// 로그인 여부(isLoggedIn)를 useState로 들고 있음
 // useAuthStorage 훅을 내부에서 사용해서 토큰 관리 기능을 함께 제공
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useAuthStorage } from "../hooks/useAuthStorage";

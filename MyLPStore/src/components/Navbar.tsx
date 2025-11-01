@@ -3,10 +3,9 @@ import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const { isLoggedIn } = useAuth(); // 단순하게 boolean 값만 구독, // 3. 컴포넌트가 useAuth를 통해 구독 (Subscriber)
+    const { isLoggedIn } = useAuth();
 
     // 복잡한 로직 완전 제거, AuthContext에서 모든 상태 관리 처리
-
     const handleLogin = () => {
         navigate('/login');
     };

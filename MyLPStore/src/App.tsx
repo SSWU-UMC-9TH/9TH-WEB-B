@@ -2,7 +2,9 @@ import HomeLayout from "./layouts/HomeLayout.tsx"
 import HomePage from "./pages/HomePage.tsx"
 import NotFoundPage from "./pages/NotFoundPage.tsx"
 import LoginPage from "./pages/LoginPage.tsx"
-import SignupPage from "./pages/SignupPage.tsx"
+import Signup01 from "./pages/SignupPage01.tsx"
+import Signup02 from "./pages/SignupPage02.tsx"
+import Signup03 from "./pages/SignupPage03.tsx"
 import MyPage from "./pages/MyPage.tsx"
 import { ProtectedLayout } from "./layouts/ProtectedLayout.tsx"
 import { AuthProvider } from "./contexts/AuthContext.tsx"
@@ -21,7 +23,9 @@ const App = () => {
                     <Route path="/" element={<HomeLayout />}>
                         <Route index element={<HomePage />} />
                         <Route path="login" element={<LoginPage />} />
-                        <Route path="signup" element={<SignupPage />} />
+                        <Route path="signup" element={<Signup01 />} />
+                        <Route path="signup/password" element={<Signup02 />} />
+                        <Route path="signup/nickname" element={<Signup03 />} />
                     </Route>
                     
                     {/* 보호된 라우트 */}

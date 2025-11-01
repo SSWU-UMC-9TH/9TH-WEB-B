@@ -4,14 +4,10 @@ import { type UserSigninInformation, validateSignin } from '../utils/validate';
 import { useNavigate } from 'react-router-dom';
 import Left from '../assets/left.png';
 import Google from '../assets/google.png';
-import { postSignin } from '../apis/auth';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { LOCAL_STORAGE_KEY } from '../constants/key';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
     const {login} = useAuth();
-    const {setItem} = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
     const navigate = useNavigate();
 
     const {values, errors, touched, getInputProps} = useForm<UserSigninInformation>({

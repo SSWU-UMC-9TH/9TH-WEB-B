@@ -1,19 +1,20 @@
 import { useEffect } from 'react'
-import { getMyInfo } from '../apis/auth.ts';
+import { axiosInstance } from '../apis/axios';
 
 const Mypage = () => {
-    useEffect(() => {
-        const getData = async () => {
-            const response=await getMyInfo();
-            console.log(response);
-        };
-        getData();
-    }, []);
-  return (
-    <div>
-      mypage
-    </div>
-  )
-}
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const response = await axiosInstance.get('/v1/users/me');
+        console.log('유저 정보:', response.data);
+      } catch (error) {
+        console.error('유저 정보 불러오기 실패:', error);
+      }
+    };
+    getData();
+  }, []);
 
-export default Mypage
+  return <div>mypage</div>;
+};
+
+export default Mypage;

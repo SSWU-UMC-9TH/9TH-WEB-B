@@ -1,4 +1,3 @@
-
 import { validateSignin, type userSigninInformation } from "../utills/validate";
 import useForm from "../hooks/useForm";
 import { IoArrowBack } from "react-icons/io5";
@@ -22,16 +21,17 @@ const LoginPage = () => {
 
     const handleSumbit = async () => {
         console.log(values);
-        try{
-            const response= await postSignin(values);
-            localStorage.setItem("accessToken", response.data.accessToken);
-            console.log(response);
-        }catch(error){
+        try {
+            const response = await postSignin(values);
+            const { accessToken, refreshToken } = response.data; 
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+            console.log("로그인 성공:", response);
+            navigate("/"); // 로그인 후 홈으로 이동
+        } catch (error) {
             console.log(error);
-            
         }
-        
-    };
+        };
     //오류가 하나라도 있거나, 입력창이 비었으면 버튼 활성화
     const isDisabled = 
     Object.values(errors || {}).some((error) => error.length > 0) || //오류가 있으면 true
@@ -48,7 +48,7 @@ const LoginPage = () => {
                 <button
                 type="button"
                 className="flex items-center justify-center border border-black rounded-md w-[300px] py-[10px] mb-3 hover:bg-gray-100 transition-colors"
-                onClick={handleGoogleLogin} // ✅ 수정된 부분
+                onClick={handleGoogleLogin} // 수정된 부분
                 >
                 <FcGoogle className="text-2xl mr-2" />
                 <span className="text-black font-medium">구글 로그인</span>
@@ -92,4 +92,3 @@ const LoginPage = () => {
     }
 
 export default LoginPage
-

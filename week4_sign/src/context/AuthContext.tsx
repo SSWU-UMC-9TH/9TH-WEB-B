@@ -53,9 +53,12 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
     const login = async (signinData: RequestSigninDto) => {
         try {
             const response = await postSignin(signinData);
-            
-            const newAccessToken = response.data.accessToken;
-            const newRefreshToken = response.data.refreshToken;
+
+            // 서버 응답 형태를 모두 수용 (data.accessToken | data.data.accessToken)
+            const resp = response as any;
+            const payload = resp?.data ?? resp;
+            const newAccessToken = payload?.accessToken ?? payload?.data?.accessToken;
+            const newRefreshToken = payload?.refreshToken ?? payload?.data?.refreshToken;
 
             if (newAccessToken && newRefreshToken) {
                 setAccessTokenInStorage(newAccessToken);
@@ -64,18 +67,12 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
                 setAccessToken(newAccessToken);
                 setRefreshToken(newRefreshToken);
                 
-                // 개발 환경에서만 로그 출력
-                if ((import.meta as any).env?.DEV) {
-                    console.log('✅ 로그인 성공');
-                }
-                
                 window.location.replace('/my');
             } else {
-                console.error('❌ 로그인 응답에 토큰이 없습니다');
+                throw new Error('로그인 응답에 토큰이 없습니다');
             }
         } catch(error) {
-            console.error('❌ 로그인 실패:', error);
-            alert('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+            throw error;
         }
     }
 

@@ -19,7 +19,7 @@ const ProtectedLayout = () => {
     // localStorage에서도 토큰 확인 (AuthContext state가 업데이트되기 전일 수 있음)
     const token = localStorage.getItem(LOCAL_STORAGE_KEY.accessToken);
 
-    console.log('🔒 ProtectedLayout 체크:', { accessToken: accessToken ? 'exists' : 'null', localStorageToken: token ? 'exists' : 'null', isChecking });
+    // 개발 디버깅 로그는 제거하여 콘솔 노이즈를 줄임
 
     if (isChecking) {
         return <div className="flex items-center justify-center min-h-screen">

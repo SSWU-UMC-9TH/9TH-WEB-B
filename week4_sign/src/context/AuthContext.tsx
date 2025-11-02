@@ -42,18 +42,10 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         const storedAccessToken = getAccessTokenFromStorage();
         const storedRefreshToken = getRefreshTokenFromStorage();
         
-        console.log('🔄 AuthContext useEffect - localStorage 토큰 확인:', {
-            storedAccessToken: storedAccessToken ? `${storedAccessToken.substring(0, 20)}...` : 'null',
-            storedRefreshToken: storedRefreshToken ? `${storedRefreshToken.substring(0, 20)}...` : 'null',
-            currentAccessToken: accessToken ? `${accessToken.substring(0, 20)}...` : 'null'
-        });
-        
         if (storedAccessToken && storedAccessToken !== accessToken) {
-            console.log('✅ accessToken 업데이트');
             setAccessToken(storedAccessToken);
         }
         if (storedRefreshToken && storedRefreshToken !== refreshToken) {
-            console.log('✅ refreshToken 업데이트');
             setRefreshToken(storedRefreshToken);
         }
     }, [getAccessTokenFromStorage, getRefreshTokenFromStorage, accessToken, refreshToken]);
@@ -62,15 +54,8 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         try {
             const response = await postSignin(signinData);
             
-            console.log('🔐 로그인 응답 전체:', response);
-            console.log('🔐 response.data:', response.data);
-
-            // ResponseSigninDto 타입에 따르면 response.data.accessToken이 맞음
             const newAccessToken = response.data.accessToken;
             const newRefreshToken = response.data.refreshToken;
-
-            console.log('✅ AccessToken:', newAccessToken);
-            console.log('✅ RefreshToken:', newRefreshToken);
 
             if (newAccessToken && newRefreshToken) {
                 setAccessTokenInStorage(newAccessToken);
@@ -79,21 +64,18 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
                 setAccessToken(newAccessToken);
                 setRefreshToken(newRefreshToken);
                 
-                // 저장 직후 확인
-                console.log('💾 localStorage 저장 확인:', {
-                    accessToken: localStorage.getItem(LOCAL_STORAGE_KEY.accessToken),
-                    refreshToken: localStorage.getItem(LOCAL_STORAGE_KEY.refreshToken),
-                    match: localStorage.getItem(LOCAL_STORAGE_KEY.accessToken) === newAccessToken
-                });
-                // 팝업 없이 조용히 이동
+                // 개발 환경에서만 로그 출력
+                if ((import.meta as any).env?.DEV) {
+                    console.log('✅ 로그인 성공');
+                }
+                
                 window.location.replace('/my');
             } else {
-                console.error('❌ 토큰이 없습니다:', { newAccessToken, newRefreshToken });
-                // 사용자 알림은 페이지에서 처리하도록 여기서는 로깅만
+                console.error('❌ 로그인 응답에 토큰이 없습니다');
             }
         } catch(error) {
-            console.error('❌ 로그인 오류:', error);
-            alert('로그인 실패');
+            console.error('❌ 로그인 실패:', error);
+            alert('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
         }
     }
 

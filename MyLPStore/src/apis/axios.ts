@@ -1,8 +1,5 @@
 import axios from "axios";
-import { useAuthStorage } from "../hooks/useAuthStorage";
-
-// useAuth 훅을 사용한 토큰 관리
-const auth = useAuthStorage();
+import { authStorage } from "../utils/authStorage";
 
 // 전역 변수로 refresh 요청의 Promise를 저장해서 중복 요청을 방지
 let refreshPromise: Promise<string> | null = null;
@@ -14,8 +11,8 @@ export const axiosInstance = axios.create({
 // 요청 인터셉터: 모든 요청 전에 accessToken을 Authorization 헤더에 추가
 axiosInstance.interceptors.request.use(
     (config) => {
-        // useAuth를 사용해서 토큰을 안전하게 가져옴
-        const accessToken = auth.getAccessToken();
+        // 순수 유틸리티를 사용해서 토큰을 안전하게 가져옴
+        const accessToken = authStorage.getAccessToken();
 
         // accessToken이 존재하면 Authorization 헤더에 Bearer 토큰 형식으로 추가
         if (accessToken) {
@@ -43,7 +40,7 @@ axiosInstance.interceptors.response.use(
             // refresh 엔드포인트에서 401 에러가 발생한 경우 로그아웃 처리
             if (originalRequest.url?.includes("/v1/auth/refresh")) {
                 console.log('Refresh token도 만료됨, 로그아웃 처리');
-                auth.clearTokens();
+                authStorage.clearTokens();
                 
                 if (window.location.pathname !== '/login') {
                     window.location.href = '/login';
@@ -58,7 +55,7 @@ axiosInstance.interceptors.response.use(
             if (!refreshPromise) {
                 refreshPromise = (async () => {
                     console.log('Refresh token 갱신 시작');
-                    const refreshToken = auth.getRefreshToken();
+                    const refreshToken = authStorage.getRefreshToken();
                     
                     if (!refreshToken) {
                         console.error('Refresh token이 없습니다');
@@ -92,7 +89,7 @@ axiosInstance.interceptors.response.use(
                     }
 
                     // 새 토큰들을 저장
-                    auth.saveTokens(newAccessToken, newRefreshToken);
+                    authStorage.saveTokens(newAccessToken, newRefreshToken);
                     console.log('새 토큰 저장 완료');
 
                     return newAccessToken;
@@ -101,7 +98,7 @@ axiosInstance.interceptors.response.use(
                     console.error('Refresh token 갱신 실패:', error.response?.data || error.message);
                     
                     // refresh 실패 시 모든 토큰을 제거하고 로그아웃
-                    auth.clearTokens();
+                    authStorage.clearTokens();
                     
                     if (window.location.pathname !== '/login') {
                         window.location.href = '/login';

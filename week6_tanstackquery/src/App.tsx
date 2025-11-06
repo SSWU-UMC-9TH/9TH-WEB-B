@@ -1,8 +1,13 @@
 import { WelcomeData } from './components/UserDataDisplay';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 const App = () => {
     return (
-        <WelcomeData />
+        <QueryClientProvider client={queryClient}>
+            <WelcomeData />
+        </QueryClientProvider>
     )
 }
 

@@ -5,7 +5,12 @@ import { authStorage } from "../utils/authStorage";
 let refreshPromise: Promise<string> | null = null;
 
 export const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_SERVER_API_URL, 
+    baseURL: import.meta.env.VITE_SERVER_API_URL,
+    headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+    }
 });
 
 // 요청 인터셉터: 모든 요청 전에 accessToken을 Authorization 헤더에 추가
@@ -19,6 +24,19 @@ axiosInstance.interceptors.request.use(
             config.headers = config.headers || {};
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
+
+        // HTTP 캐시 방지를 위한 헤더 추가
+        config.headers = config.headers || {};
+        config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+        config.headers['Pragma'] = 'no-cache';
+        config.headers['Expires'] = '0';
+        
+        // GET 요청에 타임스탬프 추가로 캐시 방지
+        if (config.method === 'get') {
+            config.params = config.params || {};
+            (config.params as any)._t = Date.now();
+        }
+
         return config;
     },
     (error) => Promise.reject(error)

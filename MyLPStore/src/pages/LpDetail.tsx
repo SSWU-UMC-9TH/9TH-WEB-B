@@ -17,22 +17,22 @@ export const LpDetail = () => {
   // LP 삭제 기능
   const deleteLpMutation = useDeleteLp();
 
-  // 디버깅용 useEffect
-  useEffect(() => {
-    console.log('LP Detail 상태:', { lpDetail, lpLoading, lpError, lpid });
-  }, [lpDetail, lpLoading, lpError, lpid]);
-
   const {
     data: comments,
     isFetching,
     hasNextPage,
     fetchNextPage,
-  } = useGetInfiniteComments(lpid, 10, order);
+  } = useGetInfiniteComments(lpid, 3, order);
 
-  const { ref, inView } = useInView({ threshold: 0.5 });
+  const { ref, inView } = useInView({ 
+    threshold: 0.1,
+    rootMargin: '100px'
+  });
 
   useEffect(() => {
+    console.log('무한스크롤 디버깅:', { inView, hasNextPage, isFetching });
     if (inView && hasNextPage && !isFetching) {
+      console.log('다음 페이지 가져오기!');
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetching, fetchNextPage]);
@@ -183,7 +183,9 @@ export const LpDetail = () => {
           </div>
 
           {/* 무한 스크롤 트리거 */}
-          <div ref={ref} className="h-10"></div>
+          <div ref={ref} className="h-20 mt-10 rounded flex items-center justify-center text-white text-sm">
+            {hasNextPage ? '스크롤하여 더 보기' : '더 이상 댓글이 없습니다'}
+          </div>
         </div>
       </div>
     </div>

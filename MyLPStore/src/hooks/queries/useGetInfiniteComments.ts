@@ -27,6 +27,11 @@ export const useGetInfiniteComments = (
     },
     enabled: !!lpId,
     getNextPageParam: (lastPage) => {
+      console.log('getNextPageParam 체크:', {
+        hasNext: lastPage.hasNext,
+        nextCursor: lastPage.nextCursor,
+        dataLength: lastPage.data?.length
+      });
       return lastPage.hasNext ? lastPage.nextCursor : undefined;
     },
   });

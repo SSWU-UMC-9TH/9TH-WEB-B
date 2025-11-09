@@ -4,7 +4,7 @@ import { FiArrowLeft, FiHeart, FiCalendar, FiUser, FiEdit, FiTrash2, FiArrowUp, 
 import { getLpDetail } from '../apis/routes/lp';
 import { getMockComments, createMockComment } from '../data/mockData';
 import ErrorMessage from '../components/ErrorMessage';
-import CommentListSkeleton, { CommentSkeleton } from '../components/CommentSkeleton';
+// import CommentListSkeleton, { CommentSkeleton } from '../components/CommentSkeleton';
 import type { Comment } from '../types/comment';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -15,6 +15,7 @@ const LpDetailPage = () => {
   const [commentOrder, setCommentOrder] = useState<'asc' | 'desc'>('desc');
   const [newComment, setNewComment] = useState('');
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [forceCommentLoading, setForceCommentLoading] = useState(false);
 
   const {
     data: lpData,
@@ -98,7 +99,7 @@ const LpDetailPage = () => {
     // 현재 로그인한 사용자 정보 가져오기
     const userData = localStorage.getItem('userData');
     if (!userData) {
-      alert('로그인이 필요합니다');
+      alert('로그인이 필요합니다.');
       return;
     }
     
@@ -328,6 +329,17 @@ const LpDetailPage = () => {
             </div>
           </div>
 
+          {/* 댓글 섹션 헤더 */}
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-white">댓글</h3>
+            <button
+              onClick={() => setForceCommentLoading(!forceCommentLoading)}
+              className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm transition-colors"
+            >
+              {forceCommentLoading ? '댓글 스켈레톤 OFF' : '댓글 스켈레톤 ON'}
+            </button>
+          </div>
+
           {/* 댓글 작성란 */}
           <div className="bg-gray-800 rounded-lg p-4 mb-6">
             <div className="flex gap-3">
@@ -360,9 +372,22 @@ const LpDetailPage = () => {
           </div>
 
           {/* 댓글 목록 */}
-          {isCommentsLoading ? (
+          {(isCommentsLoading || forceCommentLoading) ? (
             /* 초기 댓글 로딩 스켈레톤 - 상단 */
-            <CommentListSkeleton count={5} />
+            <div className="space-y-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={`comment-skeleton-${i}`} className="bg-gray-800 rounded-lg p-4 animate-pulse">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-gray-700 rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-700 rounded w-24 mb-2"></div>
+                      <div className="h-3 bg-gray-700 rounded w-full mb-1"></div>
+                      <div className="h-3 bg-gray-700 rounded w-3/4"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="space-y-4">
               {/* 실제 댓글들 */}
@@ -389,7 +414,16 @@ const LpDetailPage = () => {
               {isFetchingNextPage && (
                 <div className="space-y-4">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <CommentSkeleton key={`loading-comment-${i}`} />
+                    <div key={`loading-comment-${i}`} className="bg-gray-800 rounded-lg p-4 animate-pulse">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-gray-700 rounded-full"></div>
+                        <div className="flex-1">
+                          <div className="h-4 bg-gray-700 rounded w-24 mb-2"></div>
+                          <div className="h-3 bg-gray-700 rounded w-full mb-1"></div>
+                          <div className="h-3 bg-gray-700 rounded w-3/4"></div>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
@@ -397,7 +431,7 @@ const LpDetailPage = () => {
           )}
 
           {/* 더보기 버튼 */}
-          {!isCommentsLoading && hasNextPage && !isFetchingNextPage && (
+          {!isCommentsLoading && !forceCommentLoading && hasNextPage && !isFetchingNextPage && (
             <div className="text-center mt-6">
               <button
                 onClick={() => fetchNextPage()}
@@ -409,7 +443,7 @@ const LpDetailPage = () => {
           )}
 
           {/* 댓글이 없을 때 */}
-          {!isCommentsLoading && comments.length === 0 && (
+          {!isCommentsLoading && !forceCommentLoading && comments.length === 0 && (
             <div className="text-center py-8">
               <p className="text-gray-400">첫 번째 댓글을 작성해보세요!</p>
             </div>

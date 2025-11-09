@@ -1,7 +1,7 @@
 import React from 'react'
 import useForm from '../hooks/useForm';
 import { type UserSigninInformation, validateSignin } from '../utils/validate';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Left from '../assets/left.png';
 import Google from '../assets/google.png';
 import { useAuth } from '../context/AuthContext';
@@ -9,6 +9,9 @@ import { useAuth } from '../context/AuthContext';
 const LoginPage = () => {
     const {login} = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const from = location.state?.from?.pathname || '/';
 
     const {values, errors, touched, getInputProps} = useForm<UserSigninInformation>({
         initialValue: {
@@ -19,7 +22,7 @@ const LoginPage = () => {
     })
 
     const handleSubmit = async () => {
-        await login(values);
+        await login(values, from);
     }
 
     const handleGoogleLogin = () => {

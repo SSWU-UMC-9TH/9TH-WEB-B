@@ -1,61 +1,69 @@
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"
+import React, { useCallback, useEffect, useState } from 'react'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import FloatingButton from '../components/FloatingButton';
+import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
+import { useAuth } from '../context/AuthContext';
 
 const ProtectedLayout = () => {
-    const navigate = useNavigate();
     const {accessToken} = useAuth();
+    const location = useLocation();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    
+    const handleSidebarToggle = () => {
+        setIsSidebarOpen(prev => !prev);
+    }
+
+    const isDesktopModeRef = React.useRef(window.innerWidth >= 768);
+
+    const handleResize = useCallback(() => {
+        const currentIsDesktopMode = window.innerWidth >= 768;
+
+        if (currentIsDesktopMode !== isDesktopModeRef.current) {
+            if (currentIsDesktopMode) {
+                setIsSidebarOpen(true);
+            } else {
+                setIsSidebarOpen(false);
+            }
+            
+            isDesktopModeRef.current = currentIsDesktopMode;
+        }
+    }, [])
+
+    // useEffect(() => {
+    //     if (isDesktopModeRef.current) {
+    //         setIsSidebarOpen(true);
+    //     } else {
+    //         setIsSidebarOpen(false);
+    //     }
+        
+    //     window.addEventListener('resize', handleResize);
+        
+    //     return () => {
+    //         window.removeEventListener('resize', handleResize);
+    //     };
+    // }, [handleResize])
 
     if (!accessToken) {
-        return <Navigate to={"/login"} replace />
+        alert('로그인이 필요한 서비스입니다. 로그인을 해주세요!');
+        return <Navigate to={"/login"} state={{ from: location }} replace />
     }
+    
     return (
-            <div className='h-dvh flex flex-col'>
-                <nav className='bg-[#161616] flex items-center justify-between h-[80px] p-[20px]'>
-                    <button 
-                        className='text-[#ea00b1] font-bold text-[25px] cursor-pointer'
-                        onClick={() => navigate('/')}
-                    >
-                        돌려돌려LP판
-                    </button>
-                    <div>
-                        {!accessToken ? (
-                            <>
-                                <button 
-                                    className='text-white bg-black px-[10px] py-[5px] rounded-[5px] font-semibold cursor-pointer'
-                                    onClick={() => navigate('/login')}
-                                >
-                                    로그인
-                                </button>
-                                <button 
-                                    className='text-white bg-[#ea00b1] px-[10px] py-[5px] ml-[10px] rounded-[5px] font-semibold cursor-pointer'
-                                    onClick={() => navigate('/signup')}
-                                >
-                                    회원가입
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <button 
-                                    className='text-white bg-black px-[10px] py-[5px] rounded-[5px] font-semibold cursor-pointer'
-                                    onClick={() => navigate('/my')}
-                                >
-                                    마이페이지
-                                </button>
-                                <button 
-                                    className='text-white bg-black px-[10px] py-[5px] rounded-[5px] font-semibold cursor-pointer ml-[10px]'
-                                    onClick={() => navigate('/search')}
-                                >
-                                    검색
-                                </button>
-                            </>
-                        )}
-                    </div>
-                </nav>
-                <main className='flex-1 bg-black text-white'>
+        <div className='h-dvh flex flex-col'>
+            <Navbar onSidebarClick={handleSidebarToggle}/>
+            <div className='flex flex-1 '>
+                <Sidebar 
+                    isOpen={isSidebarOpen} 
+                    onClose={() => setIsSidebarOpen(false)} 
+                />
+                <main className='flex-1 bg-black text-white overflow-y-auto'>
                     <Outlet />
                 </main>
-                <footer className='bg-black'>푸터</footer>
             </div>
+            <footer className='bg-black'>푸터</footer>
+            <FloatingButton />
+        </div>
         )
     }
 

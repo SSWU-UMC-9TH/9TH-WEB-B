@@ -10,6 +10,8 @@ import SignupPage from './pages/SignupPage'
 import SignupPage2 from './pages/SignupPage2'
 import SignupPage3 from './pages/SignupPage3'
 import MyPage from './pages/MyPage'
+import LpCreatePage from './pages/LpCreatePage'
+import LpDetailPage from './pages/LpDetailPage'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedLayout from './layouts/ProtectedLayout'
 import GoogleLoginRedirectPage from './pages/GoogleLoginRedirectPage'
@@ -42,6 +44,14 @@ const protectedRoutes: RouteObject[] = [
                 path: 'my', 
                 element: <MyPage />
             },
+            {
+                path: `lps/:lpId`, 
+                element: <LpDetailPage />
+            },
+            {
+                path: `lps/create`, 
+                element: <LpCreatePage />
+            },
         ]
     }
 ]
@@ -62,7 +72,7 @@ function App() {
             <AuthProvider>
                 <RouterProvider router={router} />
             </AuthProvider>
-            {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+            {/* {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />} */}
         </QueryClientProvider>
     )
 }

@@ -8,8 +8,8 @@ const FloatingButton = () => {
     return (
         <button
             className='bg-[#ea00b1] w-[40px] h-[40px] rounded-full flex items-center justify-center
-            fixed bottom-[30px] right-[20px] hover:bg-[#bf008f] cursor-pointer'
-            onClick={() => navigate('/create')}
+            fixed bottom-[30px] right-[20px] hover:bg-[#bf008f] cursor-pointer z-10'
+            onClick={() => navigate('/lps/create')}
         >
             <img 
                 className='w-[30px]'

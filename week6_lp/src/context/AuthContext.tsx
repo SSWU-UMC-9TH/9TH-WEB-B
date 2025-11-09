@@ -7,7 +7,7 @@ import { createContext, useContext, useState, type PropsWithChildren } from "rea
 interface AuthContextType {
     accessToken: string | null;
     refreshToken: string | null;
-    login: (SigninData: RequestSigninDto) => Promise<void>;
+    login: (SigninData: RequestSigninDto, redirectPath: string) => Promise<void>;
     logout: () => Promise<void>;
 }
 
@@ -37,7 +37,7 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         getRefreshTokenFromStorage(),
     );
 
-    const login = async (signinData: RequestSigninDto) => {
+    const login = async (signinData: RequestSigninDto, redirectPath: string) => {
         try {
             const {data} = await postSignin(signinData);
 
@@ -51,7 +51,8 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
                 setAccessToken(newAccessToken);
                 setRefreshToken(newRefreshToken);
                 alert('로그인 성공');
-                window.location.href='/my';
+                // window.location.href='/my';
+                window.location.href = redirectPath;
             }
         } catch(error) {
             console.log('로그인 오류', error);

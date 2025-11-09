@@ -5,16 +5,17 @@ import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 
 const HomeLayout = () => {
+    const DESKTOP_BREAKPOINT = 768;
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const handleSidebarToggle = () => {
         setIsSidebarOpen(prev => !prev);
     }
 
-    const isDesktopModeRef = React.useRef(window.innerWidth >= 768);
+    const isDesktopModeRef = React.useRef(window.innerWidth >= DESKTOP_BREAKPOINT);
 
     const handleResize = useCallback(() => {
-        const currentIsDesktopMode = window.innerWidth >= 768;
+        const currentIsDesktopMode = window.innerWidth >= DESKTOP_BREAKPOINT;
 
         if (currentIsDesktopMode !== isDesktopModeRef.current) {
             if (currentIsDesktopMode) {

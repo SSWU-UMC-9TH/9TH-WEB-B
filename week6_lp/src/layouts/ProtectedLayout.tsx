@@ -6,6 +6,7 @@ import Sidebar from '../components/Sidebar';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedLayout = () => {
+    const DESKTOP_BREAKPOINT = 768;
     const {accessToken} = useAuth();
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -14,10 +15,10 @@ const ProtectedLayout = () => {
         setIsSidebarOpen(prev => !prev);
     }
 
-    const isDesktopModeRef = React.useRef(window.innerWidth >= 768);
+    const isDesktopModeRef = React.useRef(window.innerWidth >= DESKTOP_BREAKPOINT);
 
     const handleResize = useCallback(() => {
-        const currentIsDesktopMode = window.innerWidth >= 768;
+        const currentIsDesktopMode = window.innerWidth >= DESKTOP_BREAKPOINT;
 
         if (currentIsDesktopMode !== isDesktopModeRef.current) {
             if (currentIsDesktopMode) {

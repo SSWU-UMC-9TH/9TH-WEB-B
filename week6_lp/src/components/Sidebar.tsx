@@ -9,6 +9,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({isOpen, onClose}: SidebarProps) => {
+    const DESKTOP_BREAKPOINT = 768;
     const sidebarRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
@@ -25,7 +26,7 @@ const Sidebar = ({isOpen, onClose}: SidebarProps) => {
     }
     }, [isOpen, onClose])
 
-    const isDesktop = window.innerWidth >= 768;
+    const isDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
 
     return (
         <>

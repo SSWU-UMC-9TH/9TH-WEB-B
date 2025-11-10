@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { CursorBaedResponse } from "./commons";
+import { CursorBasedResponse } from "./commons";
 
 export type Tag={
     id:number;
@@ -38,4 +38,4 @@ export type Lp= {
     author?: Author;
 };
 
-export type ResponseLpListDto=CursorBaedResponse<Lp[]>;
+export type ResponseLpListDto=CursorBasedResponse<Lp[]>;

@@ -46,8 +46,15 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
 
     // 컴포넌트 마운트 시 localStorage에서 토큰 읽기
     useEffect(() => {
+        console.log('🔄 AuthContext 초기화 중...');
         const storedAccessToken = getStorageItem(LOCAL_STORAGE_KEY.accessToken);
         const storedRefreshToken = getStorageItem(LOCAL_STORAGE_KEY.refreshToken);
+        
+        console.log('📋 저장된 토큰:', {
+            accessToken: storedAccessToken,
+            refreshToken: storedRefreshToken,
+            key: LOCAL_STORAGE_KEY.accessToken
+        });
         
         setAccessToken(storedAccessToken);
         setRefreshToken(storedRefreshToken);

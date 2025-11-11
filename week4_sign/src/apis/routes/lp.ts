@@ -7,7 +7,7 @@ import type {
   CreateLpResponse
 } from '../../types/lp';
 
-// LP 목록 조회 (실제 백엔드 API - 전체 공용 LP 목록)
+// LP 목록 조회 (실제 백엔드 API, 실패 시 mockData 사용)
 export const getLpList = async (params?: LpListParams): Promise<LpListResponse> => {
   try {
     console.log('전체 LP 목록 API 요청 시작:', params);
@@ -19,11 +19,14 @@ export const getLpList = async (params?: LpListParams): Promise<LpListResponse> 
     return response.data;
   } catch (error) {
     console.error('전체 LP 목록 요청 실패:', error);
+    console.error('⚠️ 백엔드 서버가 실행 중인지 확인해주세요 (localhost:8000)');
+    
+    // 실제 백엔드 연결을 우선하므로 에러를 그대로 throw
     throw error;
   }
 };
 
-// LP 상세 조회 (실제 백엔드 API)
+// LP 상세 조회 (실제 백엔드 API, 실패 시 mockData 사용)
 export const getLpDetail = async (lpId: string): Promise<LpDetailResponse> => {
   try {
     console.log('LP 상세 요청 시작:', lpId);
@@ -34,6 +37,9 @@ export const getLpDetail = async (lpId: string): Promise<LpDetailResponse> => {
     return response.data;
   } catch (error) {
     console.error('LP 상세 요청 실패:', error);
+    console.error('⚠️ 백엔드 서버가 실행 중인지 확인해주세요 (localhost:8000)');
+    
+    // 실제 백엔드 연결을 우선하므로 에러를 그대로 throw
     throw error;
   }
 };

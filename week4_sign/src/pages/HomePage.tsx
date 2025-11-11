@@ -1,15 +1,42 @@
-﻿import React, { useState } from 'react'
-import useGetLpList from '../hooks/queries/useGetLpList';
+﻿import React, { useState, useEffect, useCallback } from 'react'
+import useInfiniteLpList from '../hooks/queries/useInfiniteLpList';
 import LpCard from '../components/LpCard';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 
 const HomePage = () => {
     const [search, setSearch] = useState("");
     const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'rating'>('latest');
-    const {data: lps, isPending, isError, error, refetch} = useGetLpList({ search, sortBy });
+    const {
+        data: lps, 
+        isPending, 
+        isError, 
+        error, 
+        refetch,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useInfiniteLpList({ search, sortBy });
     
     // 안전한 데이터 처리
     const lpsList = Array.isArray(lps) ? lps : [];
+
+    // 무한스크롤 트리거
+    const handleScroll = useCallback(() => {
+        if (
+            window.innerHeight + document.documentElement.scrollTop 
+            >= document.documentElement.offsetHeight - 1000 // 1000px 전에 미리 로드
+            && hasNextPage 
+            && !isFetchingNextPage
+        ) {
+            console.log('🔄 무한스크롤 트리거: 다음 페이지 로딩...');
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [handleScroll]);
 
     const handleOrder = (newSortBy: 'latest' | 'popular' | 'rating') => {
         setSortBy(newSortBy);
@@ -81,17 +108,44 @@ const HomePage = () => {
             </div>
             
             {/* LP 목록 그리드 */}
-            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
-                {lpsList.length > 0 ? (
-                    lpsList.map((lp) => (
-                        <LpCard key={lp.id} lp={lp} />
-                    ))
-                ) : (
+            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8'>
+                {/* 초기 로딩 스켈레톤 (상단) */}
+                {isPending && (
+                    <>
+                        {Array.from({ length: 10 }, (_, i) => (
+                            <LoadingSkeleton key={`skeleton-${i}`} />
+                        ))}
+                    </>
+                )}
+                
+                {/* 실제 LP 카드들 */}
+                {lpsList.length > 0 && lpsList.map((lp) => (
+                    <LpCard key={lp.id} lp={lp} />
+                ))}
+                
+                {/* 추가 로딩 스켈레톤 (하단) */}
+                {isFetchingNextPage && (
+                    <>
+                        {Array.from({ length: 5 }, (_, i) => (
+                            <LoadingSkeleton key={`next-skeleton-${i}`} />
+                        ))}
+                    </>
+                )}
+                
+                {/* 데이터가 없을 때 */}
+                {!isPending && lpsList.length === 0 && (
                     <div className='col-span-full text-center text-gray-400 py-8'>
                         <p>표시할 LP가 없습니다.</p>
                     </div>
                 )}
             </div>
+            
+            {/* 무한스크롤 상태 표시 */}
+            {!hasNextPage && lpsList.length > 0 && (
+                <div className='text-center text-gray-400 py-8'>
+                    <p>모든 LP를 불러왔습니다. 🎵</p>
+                </div>
+            )}
         </div>
     )
 }

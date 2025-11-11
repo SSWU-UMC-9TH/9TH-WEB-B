@@ -9,6 +9,7 @@ import LpDetailPage from "./pages/LpDetailPage";
 import LpCreatePage from "./pages/LpCreatePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import MyPage from "./pages/MyPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import PublicOnlyRoute from "./components/PublicOnlyRoute";
@@ -86,6 +87,13 @@ function App() {
               
               {/* LP 상세 페이지 */}
               <Route path="lp/:lpId" element={<LpDetailPage />} />
+              
+              {/* 마이페이지 - 보호된 라우트 */}
+              <Route path="mypage" element={
+                <ProtectedRoute>
+                  <MyPage />
+                </ProtectedRoute>
+              } />
               
               {/* Protected routes */}
               <Route path="lps/create" element={

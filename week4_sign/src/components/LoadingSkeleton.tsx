@@ -9,50 +9,70 @@ const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({ count = 1, className 
   const skeletonItems = Array.from({ length: count }, (_, index) => (
     <div
       key={index}
-      className={`animate-pulse bg-gray-800 rounded-lg ${className}`}
+      className={`${className} overflow-hidden`}
       style={{
-        minHeight: '200px',
+        backgroundColor: '#0f0f0f',
+        borderRadius: '16px',
+        border: '2px solid transparent',
+        width: '100%',
         display: 'flex',
-        flexDirection: 'column' as const,
-        gap: '12px',
-        padding: '16px'
+        flexDirection: 'column' as const
       }}
     >
       {/* 이미지 영역 */}
       <div
+        className="animate-pulse aspect-square"
         style={{
           width: '100%',
-          height: '120px',
-          backgroundColor: '#374151',
+          backgroundColor: '#1a1a1a',
           borderRadius: '8px'
         }}
       />
       
       {/* 제목 영역 */}
       <div
+        className="animate-pulse"
         style={{
           width: '80%',
-          height: '16px',
-          backgroundColor: '#374151',
+          height: '18px',
+          backgroundColor: '#444444',
           borderRadius: '4px'
         }}
       />
       
-      {/* 내용 영역 */}
-      <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '8px' }}>
+      {/* 작성자 영역 */}
+      <div
+        className="animate-pulse"
+        style={{
+          width: '60%',
+          height: '14px',
+          backgroundColor: '#444444',
+          borderRadius: '4px'
+        }}
+      />
+      
+      {/* 하단 정보 영역 */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        marginTop: 'auto' 
+      }}>
         <div
+          className="animate-pulse"
           style={{
-            width: '100%',
+            width: '40%',
             height: '12px',
-            backgroundColor: '#374151',
+            backgroundColor: '#444444',
             borderRadius: '4px'
           }}
         />
         <div
+          className="animate-pulse"
           style={{
-            width: '60%',
+            width: '30%',
             height: '12px',
-            backgroundColor: '#374151',
+            backgroundColor: '#444444',
             borderRadius: '4px'
           }}
         />

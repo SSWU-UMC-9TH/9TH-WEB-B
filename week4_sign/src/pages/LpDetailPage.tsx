@@ -2,20 +2,24 @@
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { FiArrowLeft, FiHeart, FiCalendar, FiUser, FiEdit, FiTrash2, FiArrowUp, FiArrowDown, FiSend } from 'react-icons/fi';
 import { getLpDetail } from '../apis/routes/lp';
-import { getMockComments, createMockComment } from '../data/mockData';
+import { createComment } from '../apis/routes/comment';
 import ErrorMessage from '../components/ErrorMessage';
 import type { Comment } from '../types/comment';
 import type { LpDetailResponse } from '../types/lp';
 import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { LOCAL_STORAGE_KEY } from '../constants/key';
+import useGetComments from '../hooks/queries/useGetComments';
 
 const LpDetailPage = () => {
   const { lpId } = useParams<{ lpId: string }>();
   const navigate = useNavigate();
+  const { accessToken } = useAuth();
   const [imageError, setImageError] = useState(false);
   const [commentOrder, setCommentOrder] = useState<'asc' | 'desc'>('desc');
   const [newComment, setNewComment] = useState('');
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [forceCommentLoading, setForceCommentLoading] = useState(false);
+
 
   const {
     data: lpData,
@@ -28,38 +32,50 @@ const LpDetailPage = () => {
     enabled: !!lpId,
   });
 
-  // 댓글 목록 useInfiniteQuery
+  // 실제 백엔드 댓글 API 사용
   const {
-    data: commentsData,
+    data: comments,
     isPending: isCommentsLoading,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     refetch: refetchComments,
-  } = useInfiniteQuery({
-    queryKey: ['lpComments', lpId, commentOrder],
-    queryFn: ({ pageParam = 0 }) => 
-      getMockComments(lpId!),
-    getNextPageParam: (lastPage) => {
-      if (lastPage?.data?.hasNext) {
-        return lastPage.data.nextCursor;
-      }
-      return undefined;
-    },
-    initialPageParam: 0,
-    enabled: !!lpId,
+    isError: isCommentsError,
+    error: commentsError,
+  } = useGetComments({
+    lpId: lpId!,
+    order: commentOrder,
+    limit: 10
   });
 
-  // 모든 페이지의 댓글을 플랫화
-  const comments = commentsData?.pages?.flatMap(page => page?.data?.data || []) || [];
+  // 댓글 디버깅 로그
+  useEffect(() => {
+    console.log('🔍 댓글 상태 디버깅:', {
+      lpId,
+      comments: comments?.length || 0,
+      isCommentsLoading,
+      isCommentsError,
+      commentsError: commentsError?.message,
+      commentOrder
+    });
+  }, [comments, isCommentsLoading, isCommentsError, commentsError, lpId, commentOrder]);
 
   // 로그인 상태 체크
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    const token = localStorage.getItem(LOCAL_STORAGE_KEY.accessToken);
+    console.log('🔍 LpDetailPage 토큰 체크:', { 
+      accessToken, 
+      storedToken: token,
+      showModal: !accessToken && !token 
+    });
+    
+    // AuthContext와 localStorage 둘 다 토큰이 없을 때만 모달 표시
+    if (!accessToken && !token) {
       setShowLoginModal(true);
+    } else {
+      setShowLoginModal(false);
     }
-  }, []);
+  }, [accessToken]);
 
   // 상대적 시간 계산 함수
   const getRelativeTime = (dateString: string) => {
@@ -88,7 +104,7 @@ const LpDetailPage = () => {
   };
 
   // 댓글 작성 함수
-  const handleSubmitComment = () => {
+  const handleSubmitComment = async () => {
     if (!newComment.trim() || !lpId) return;
     
     // 현재 로그인한 사용자 정보 가져오기
@@ -98,16 +114,25 @@ const LpDetailPage = () => {
       return;
     }
     
-    const user = JSON.parse(userData);
-    
-    // 댓글 추가
-    createMockComment(newComment.trim(), lpId!);
-    
-    // 입력창 초기화
-    setNewComment('');
-    
-    // 댓글 목록 새로고침
-    refetchComments();
+    try {
+      // 실제 백엔드 API로 댓글 생성
+      await createComment(lpId!, {
+        content: newComment.trim(),
+        lpId: lpId!
+      });
+      
+      console.log('✅ 댓글 생성 성공');
+      
+      // 입력창 초기화
+      setNewComment('');
+      
+      // 댓글 목록 새로고침 (실제 백엔드에서 최신 댓글 가져오기)
+      refetchComments();
+      
+    } catch (error) {
+      console.error('❌ 댓글 생성 실패:', error);
+      alert('댓글 작성에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   const handleBack = () => {
@@ -324,16 +349,7 @@ const LpDetailPage = () => {
             </div>
           </div>
 
-          {/* 댓글 섹션 헤더 */}
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-white">댓글</h3>
-            <button
-              onClick={() => setForceCommentLoading(!forceCommentLoading)}
-              className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm transition-colors"
-            >
-              {forceCommentLoading ? '댓글 스켈레톤 OFF' : '댓글 스켈레톤 ON'}
-            </button>
-          </div>
+
 
           {/* 댓글 작성란 */}
           <div className="bg-gray-800 rounded-lg p-4 mb-6">
@@ -367,7 +383,7 @@ const LpDetailPage = () => {
           </div>
 
           {/* 댓글 목록 */}
-          {(isCommentsLoading || forceCommentLoading) ? (
+          {isCommentsLoading ? (
             /* 초기 댓글 로딩 스켈레톤 - 상단 */
             <div className="space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -426,7 +442,7 @@ const LpDetailPage = () => {
           )}
 
           {/* 더보기 버튼 */}
-          {!isCommentsLoading && !forceCommentLoading && hasNextPage && !isFetchingNextPage && (
+          {!isCommentsLoading && hasNextPage && !isFetchingNextPage && (
             <div className="text-center mt-6">
               <button
                 onClick={() => fetchNextPage()}
@@ -438,9 +454,14 @@ const LpDetailPage = () => {
           )}
 
           {/* 댓글이 없을 때 */}
-          {!isCommentsLoading && !forceCommentLoading && comments.length === 0 && (
+          {!isCommentsLoading && comments.length === 0 && (
             <div className="text-center py-8">
               <p className="text-gray-400">첫 번째 댓글을 작성해보세요!</p>
+              {isCommentsError && (
+                <p className="text-red-400 text-sm mt-2">
+                  댓글을 불러오는 중 오류가 발생했습니다: {commentsError?.message}
+                </p>
+              )}
             </div>
           )}
         </div>

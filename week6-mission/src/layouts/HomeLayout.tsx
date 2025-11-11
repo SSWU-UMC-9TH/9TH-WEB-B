@@ -1,18 +1,38 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiSearch, FiUser } from "react-icons/fi";
 
 
 const HomeLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
-  const accessToken = localStorage.getItem("accessToken");
+  const location = useLocation();
+  const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken"));
+  
+
+  useEffect(() => {
+    const restrictedPaths = [/^\/lp\/[^\/]+$/, /^\/lps\/[^\/]+$/];
+    const isRestrictedPath = restrictedPaths.some((pattern) => pattern.test(location.pathname));
+    if (isRestrictedPath && !accessToken) {
+      const confirmLogin = window.confirm("로그인이 필요한 서비스입니다. 로그인 페이지로 이동할까요?");
+      if (confirmLogin) {
+        navigate("/login", { state: { from: location.pathname } });
+      }
+    }
+  }, [location.pathname, accessToken, navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    navigate("/login");
-  };
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+
+  setAccessToken(null); 
+  alert("로그아웃 되었습니다!");
+  navigate("/login");
+
+  
+  
+};
 
   return (
     <div className='h-dvh flex flex-col'>

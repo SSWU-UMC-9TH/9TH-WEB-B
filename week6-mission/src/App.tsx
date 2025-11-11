@@ -10,11 +10,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SearchPage from './pages/SearchPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import LpDetailPage from './pages/LpDetailPage';   
 
-
-//1. 홈페이지
-//2. 로그인 페이지
-//3. 회원가입 페이지
 const router = createBrowserRouter([
   {
     path: '/',
@@ -25,7 +22,6 @@ const router = createBrowserRouter([
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignupPage /> },
       { path: '/search', element: <SearchPage /> },
-
       {
         path: '/mypage',
         element: (
@@ -34,6 +30,7 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      { path: '/lps/:lpid', element: <LpDetailPage /> }, 
     ],
   },
 ]);
@@ -47,7 +44,6 @@ function App() {
       {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
-
 }
 
-export default App
+export default App;

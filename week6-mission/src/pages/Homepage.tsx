@@ -19,7 +19,7 @@ const Homepage = () => {
         {data?.data.map((lp) => (
           <div
             key={lp.id}
-            onClick={() => navigate(`/lp/${lp.id}`)} // ✅ 라우팅 연결
+            onClick={() => { navigate(`/lps/${lp.id}`); }} // 라우팅 연결
             className="
               relative group cursor-pointer
               overflow-hidden rounded-md

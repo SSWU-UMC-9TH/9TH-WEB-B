@@ -1,69 +1,109 @@
+﻿import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from './context/AuthContext';
+import MainLayout from './layouts/MainLayout';
+import HomePage from "./pages/HomePage";
+import LpListPage from "./pages/LpListPage";
+import LpDetailPage from "./pages/LpDetailPage";
+import LpCreatePage from "./pages/LpCreatePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import HomePage from "./pages/HomePage";
-import MyPage from "./pages/MyPage";
 import NotFoundPage from "./pages/NotFoundPage";
-import ProtectedLayout from "./layouts/ProtectedLayout";
-import { AuthProvider } from "./context/AuthContext";
-import { useEffect } from "react";
-import { LOCAL_STORAGE_KEY } from "./constants/key";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import PublicOnlyRoute from "./components/PublicOnlyRoute";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5분
+      gcTime: 1000 * 60 * 10, // 10분
+      retry: 1, // 재시도 횟수 줄이기
+    },
+  },
+});
+
+// Error Boundary 컴포넌트
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error Boundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-500 mb-4">오류가 발생했습니다</h1>
+            <p className="mb-4">페이지를 새로고침해주세요.</p>
+            <button 
+              className="bg-pink-500 px-4 py-2 rounded"
+              onClick={() => window.location.reload()}
+            >
+              새로고침
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* public */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route
-            path="/oauth/callback"
-            element={
-              <OAuthCallbackInline />
-            }
-          />
-          {/* 백엔드 또는 구글 콘솔 설정에 따라 프런트 도메인의 이 경로로 돌아오는 경우가 있어 404 방지용으로 동일 처리 */}
-          <Route
-            path="/v1/auth/google/callback"
-            element={<OAuthCallbackInline />}
-          />
-
-          {/* protected */}
-          <Route element={<ProtectedLayout />}> 
-            <Route path="/my" element={<MyPage />} />
-          </Route>
-
-          {/* not found */}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <BrowserRouter>
+          <Routes>
+            {/* Public routes with special layout */}
+            <Route element={<PublicOnlyRoute />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+            </Route>
+            
+            {/* Main layout routes */}
+            <Route path="/" element={<MainLayout />}>
+              {/* 홈페이지 */}
+              <Route index element={<HomePage />} />
+              
+              {/* LP 목록 페이지 */}
+              <Route path="lps" element={<LpListPage />} />
+              
+              {/* LP 상세 페이지 */}
+              <Route path="lp/:lpId" element={<LpDetailPage />} />
+              
+              {/* Protected routes */}
+              <Route path="lps/create" element={
+                <ProtectedRoute>
+                  <LpCreatePage />
+                </ProtectedRoute>
+              } />
+            </Route>
+            
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
-// 인라인 OAuth 콜백 처리 (백엔드가 쿼리로 토큰 전달하는 경우 대비)
-function OAuthCallbackInline() {
-  useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      // 다양한 백엔드/프로바이더가 사용하는 파라미터 키 대응
-      const accessToken =
-        params.get("accessToken") ||
-        params.get("access_token");
-      const refreshToken =
-        params.get("refreshToken") ||
-        params.get("refresh_token");
-      if (accessToken) localStorage.setItem(LOCAL_STORAGE_KEY.accessToken, accessToken);
-      if (refreshToken) localStorage.setItem(LOCAL_STORAGE_KEY.refreshToken, refreshToken);
-    } catch {
-      // ignore
-    } finally {
-      window.location.replace("/my");
-    }
-  }, []);
-  return null;
-}
-
 export default App;
+
+

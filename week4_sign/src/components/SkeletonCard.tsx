@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 const SkeletonCard = () => {
   return (
@@ -41,3 +41,4 @@ const SkeletonCard = () => {
 };
 
 export default SkeletonCard;
+

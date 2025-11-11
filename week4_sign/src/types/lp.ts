@@ -1,4 +1,4 @@
-export interface LpTag {
+﻿export interface LpTag {
   id: string;
   name: string;
 }
@@ -67,6 +67,21 @@ export interface LpListParams {
   limit?: number;
   search?: string;
   order?: 'asc' | 'desc';
+  sortBy?: 'latest' | 'popular' | 'rating';
+  page?: number;
 }
+
+export interface LP {
+  id: string;
+  title: string;
+  artist: string;
+  imageUrl?: string;
+  price: number;
+  rating: number;
+  likes: number;
+  releaseDate: string;
+}
+
+
 
 

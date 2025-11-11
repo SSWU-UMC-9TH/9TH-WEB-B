@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 // 개별 댓글 스켈레톤
 export const CommentSkeleton = () => {
@@ -33,3 +33,4 @@ const CommentListSkeleton = ({ count = 5 }: { count?: number }) => {
 };
 
 export default CommentListSkeleton;
+

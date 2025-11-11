@@ -1,11 +1,11 @@
-import { useParams, useNavigate } from 'react-router-dom';
+﻿import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { FiArrowLeft, FiHeart, FiCalendar, FiUser, FiEdit, FiTrash2, FiArrowUp, FiArrowDown, FiSend } from 'react-icons/fi';
 import { getLpDetail } from '../apis/routes/lp';
 import { getMockComments, createMockComment } from '../data/mockData';
 import ErrorMessage from '../components/ErrorMessage';
-// import CommentListSkeleton, { CommentSkeleton } from '../components/CommentSkeleton';
 import type { Comment } from '../types/comment';
+import type { LpDetailResponse } from '../types/lp';
 import { useState, useEffect, useCallback } from 'react';
 
 const LpDetailPage = () => {
@@ -22,7 +22,7 @@ const LpDetailPage = () => {
     isLoading,
     isError,
     refetch,
-  } = useQuery({
+  } = useQuery<LpDetailResponse>({
     queryKey: ['lp', lpId],
     queryFn: () => getLpDetail(lpId!),
     enabled: !!lpId,
@@ -39,12 +39,7 @@ const LpDetailPage = () => {
   } = useInfiniteQuery({
     queryKey: ['lpComments', lpId, commentOrder],
     queryFn: ({ pageParam = 0 }) => 
-      getMockComments({
-        lpId: lpId!,
-        cursor: pageParam,
-        order: commentOrder,
-        limit: 5,
-      }),
+      getMockComments(lpId!),
     getNextPageParam: (lastPage) => {
       if (lastPage?.data?.hasNext) {
         return lastPage.data.nextCursor;
@@ -106,7 +101,7 @@ const LpDetailPage = () => {
     const user = JSON.parse(userData);
     
     // 댓글 추가
-    createMockComment(newComment.trim(), lpId, user.id, user.nickname);
+    createMockComment(newComment.trim(), lpId!);
     
     // 입력창 초기화
     setNewComment('');
@@ -455,3 +450,4 @@ const LpDetailPage = () => {
 };
 
 export default LpDetailPage;
+

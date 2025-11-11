@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { getMyInfo } from '../apis/auth'
 import type { ResponseMyInfoDto } from '../types/auth';
 import { useAuth } from '../context/AuthContext';
@@ -79,3 +79,4 @@ const MyPage = () => {
 }
 
 export default MyPage
+

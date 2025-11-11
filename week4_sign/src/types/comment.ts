@@ -1,4 +1,4 @@
-export interface Comment {
+﻿export interface Comment {
   id: string;
   content: string;
   lpId: string;
@@ -32,3 +32,4 @@ export interface CreateCommentResponse {
   data: Comment;
   message: string;
 }
+

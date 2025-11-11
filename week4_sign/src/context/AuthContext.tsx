@@ -1,6 +1,5 @@
-import { postLogout, postSignin } from "../apis/auth";
+﻿import { postLogout, postSignin } from "../apis/auth";
 import { LOCAL_STORAGE_KEY } from "../constants/key";
-import { useLocalStorage } from "../hooks/useLocalStorage";
 import type { RequestSigninDto } from "../types/auth";
 import { createContext, useContext, useState, useEffect, type PropsWithChildren } from "react";
 
@@ -18,37 +17,41 @@ export const AuthContext = createContext<AuthContextType>({
     logout: async () => {},
 })
 
+const getStorageItem = (key: string): string | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+        const item = window.localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+    } catch {
+        return null;
+    }
+};
+
+const setStorageItem = (key: string, value: string | null): void => {
+    if (typeof window === 'undefined') return;
+    try {
+        if (value) {
+            window.localStorage.setItem(key, JSON.stringify(value));
+        } else {
+            window.localStorage.removeItem(key);
+        }
+    } catch (error) {
+        console.error('Storage error:', error);
+    }
+};
+
 export const AuthProvider = ({children}: PropsWithChildren) => {
-    const {
-        getItem: getAccessTokenFromStorage, 
-        setItem: setAccessTokenInStorage, 
-        removeItem: removeAccessTokenFromStorage
-    } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
-    const {
-        getItem: getRefreshTokenFromStorage, 
-        setItem: setRefreshTokenInStorage, 
-        removeItem: removeRefreshTokenFromStorage
-    } = useLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+    const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
-    const [accessToken, setAccessToken] = useState<string | null>(
-        getAccessTokenFromStorage(),
-    );
-    const [refreshToken, setRefreshToken] = useState<string | null>(
-        getRefreshTokenFromStorage(),
-    );
-
-    // 컴포넌트 마운트 시 localStorage에서 토큰 다시 읽기
+    // 컴포넌트 마운트 시 localStorage에서 토큰 읽기
     useEffect(() => {
-        const storedAccessToken = getAccessTokenFromStorage();
-        const storedRefreshToken = getRefreshTokenFromStorage();
+        const storedAccessToken = getStorageItem(LOCAL_STORAGE_KEY.accessToken);
+        const storedRefreshToken = getStorageItem(LOCAL_STORAGE_KEY.refreshToken);
         
-        if (storedAccessToken && storedAccessToken !== accessToken) {
-            setAccessToken(storedAccessToken);
-        }
-        if (storedRefreshToken && storedRefreshToken !== refreshToken) {
-            setRefreshToken(storedRefreshToken);
-        }
-    }, [getAccessTokenFromStorage, getRefreshTokenFromStorage, accessToken, refreshToken]);
+        setAccessToken(storedAccessToken);
+        setRefreshToken(storedRefreshToken);
+    }, []);
 
     const login = async (signinData: RequestSigninDto) => {
         try {
@@ -61,13 +64,21 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
             const newRefreshToken = payload?.refreshToken ?? payload?.data?.refreshToken;
 
             if (newAccessToken && newRefreshToken) {
-                setAccessTokenInStorage(newAccessToken);
-                setRefreshTokenInStorage(newRefreshToken);
+                setStorageItem(LOCAL_STORAGE_KEY.accessToken, newAccessToken);
+                setStorageItem(LOCAL_STORAGE_KEY.refreshToken, newRefreshToken);
+
+                // 사용자 정보도 저장 (이름 등)
+                const userData = {
+                    id: payload?.id ?? payload?.data?.id,
+                    name: payload?.name ?? payload?.data?.name,
+                    email: signinData.email
+                };
+                setStorageItem('userData', JSON.stringify(userData));
 
                 setAccessToken(newAccessToken);
                 setRefreshToken(newRefreshToken);
                 
-                window.location.replace('/my');
+                window.location.replace('/');
             } else {
                 throw new Error('로그인 응답에 토큰이 없습니다');
             }
@@ -79,23 +90,18 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
     const logout = async () => {
         try {
             await postLogout();
-            removeAccessTokenFromStorage();
-            removeRefreshTokenFromStorage();
-
-            setAccessToken(null);
-            setRefreshToken(null);
-            // 팝업 없이 홈으로 이동 (history 교체)
-            window.location.replace('/');
         } catch(error) {
             console.log("로그아웃 오류", error);
-            // 에러가 나도 로컬 토큰은 삭제하고 로그인 페이지로 이동
-            removeAccessTokenFromStorage();
-            removeRefreshTokenFromStorage();
+        } finally {
+            // 에러가 나도 로컬 토큰은 삭제하고 홈으로 이동
+            setStorageItem(LOCAL_STORAGE_KEY.accessToken, null);
+            setStorageItem(LOCAL_STORAGE_KEY.refreshToken, null);
             setAccessToken(null);
             setRefreshToken(null);
             window.location.replace('/');
         }
     }
+    
     return (
         <AuthContext.Provider value={{accessToken, refreshToken, login, logout}}>
             {children}
@@ -111,3 +117,4 @@ export const useAuth = () => {
 
     return context;
 }
+

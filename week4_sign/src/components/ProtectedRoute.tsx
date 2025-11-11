@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+﻿import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LOCAL_STORAGE_KEY } from '../constants/key';
 
@@ -19,3 +19,5 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     
     return <>{children}</>;
 };
+
+

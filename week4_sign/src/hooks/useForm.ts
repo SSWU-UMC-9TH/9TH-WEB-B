@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from "react";
+﻿import { useEffect, useState, type ChangeEvent } from "react";
 
 interface UseFormProps<T> {
     initialValue: T; // {email: '', password: ''}
@@ -50,3 +50,4 @@ function useForm<T>({initialValue, validate}: UseFormProps<T>) {
 }
 
 export default useForm;
+

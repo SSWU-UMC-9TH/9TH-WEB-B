@@ -1,4 +1,4 @@
-import type { CommonResponse } from "./common";
+﻿import type { CommonResponse } from "./common";
 
 // 회원가입
 export type RequestSignupDto = {
@@ -42,3 +42,4 @@ export type ResponseMyInfoDto = CommonResponse<{
     createdAt: Date;
     updatedAt: Date;
 }>
+

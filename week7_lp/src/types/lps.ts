@@ -52,3 +52,9 @@ export type ResponseLikeLpDto = CommonResponse<{
     userId: number;
     lpId: number;
 }>
+
+export type ResponseLpDto = CommonResponse<Lp>;
+
+export type RequestLpDto = {
+    lpId: number;
+}

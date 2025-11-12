@@ -1,5 +1,5 @@
 import type { PaginationDto, CommonResponse, CursorBasedResponse } from "../types/common";
-import type { ResponseLpListDto, Lp } from "../types/lps";
+import type { ResponseLpListDto, Lp, RequestLpDto } from "../types/lps";
 import { axiosInstance } from "./axios";
 
 export const getLpList = async (paginationDto: PaginationDto): Promise<ResponseLpListDto> => {

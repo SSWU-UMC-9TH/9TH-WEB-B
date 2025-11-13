@@ -3,11 +3,17 @@
 // useAuthStorage 훅을 내부에서 사용해서 토큰 관리 기능을 함께 제공
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useAuthStorage } from "../hooks/useAuthStorage";
+import { getMyInfo } from "../apis/auth";
+import { postLogout } from "../apis/auth";
+import { ResponseMyInfoDto } from "../types/auth";
 
 interface AuthContextType {
   isLoggedIn: boolean;
+  accessToken: string | null;
+  userInfo: ResponseMyInfoDto | null;
   saveTokens: (accessToken: string, refreshToken: string) => void;
   clearTokens: () => void;
+  logout: () => Promise<void>;
   getAccessToken: () => string | null;
   getRefreshToken: () => string | null;
 }
@@ -21,12 +27,39 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { saveTokens, clearTokens, getAccessToken, getRefreshToken } = useAuthStorage(); // 토큰 유틸리티 가져옴
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!getAccessToken()); // 전역 로그인 상태
+  const [userInfo, setUserInfo] = useState<ResponseMyInfoDto | null>(null); // 사용자 정보
+  const [accessToken, setAccessToken] = useState<string | null>(() => getAccessToken()); // 액세스 토큰 상태
 
   // storage 이벤트 감지로 실시간 동기화
   useEffect(() => {
-    const syncAuth = () => {
-      setIsLoggedIn(!!getAccessToken());
+    const syncAuth = async () => {
+      const token = getAccessToken();
+      const hasToken = !!token;
+      
+      setIsLoggedIn(hasToken);
+      setAccessToken(token);
+      
+      // 토큰이 있고 현재 사용자 정보가 없을 때만 로드
+      if (hasToken && !userInfo) {
+        try {
+          const info = await getMyInfo();
+          setUserInfo(info);
+        } catch (error) {
+          console.error('사용자 정보 로드 실패:', error);
+          // 토큰이 유효하지 않으면 클리어
+          if (error instanceof Error && error.message.includes('401')) {
+            clearTokens();
+            setIsLoggedIn(false);
+            setAccessToken(null);
+            setUserInfo(null);
+          }
+        }
+      } else if (!hasToken) {
+        setUserInfo(null);
+      }
     };
+
+    syncAuth(); // 초기 로드
 
     // storage 이벤트 리스너 (다른 탭에서의 변경 감지)
     window.addEventListener("storage", syncAuth);
@@ -42,26 +75,55 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       window.removeEventListener("storage", syncAuth);
       window.removeEventListener("focus", handleFocus);
     };
-  }, [getAccessToken]);
+  }, []); // dependency 배열을 비워서 무한 루프 방지
 
   // 토큰 저장 시 상태 변경 + 즉시 업데이트
-  const handleSaveTokens = (accessToken: string, refreshToken: string) => {
-    saveTokens(accessToken, refreshToken); // 토큰 저장
+  const handleSaveTokens = async (accessTokenParam: string, refreshToken: string) => {
+    saveTokens(accessTokenParam, refreshToken); // 토큰 저장
     setIsLoggedIn(true); // 즉시 UI 업데이트
+    setAccessToken(accessTokenParam);
+    
+    // 사용자 정보도 로드
+    try {
+      const info = await getMyInfo();
+      setUserInfo(info);
+    } catch (error) {
+      console.error('사용자 정보 로드 실패:', error);
+    }
+  };
+
+  // 로그아웃 함수
+  const logout = async () => {
+    try {
+      await postLogout();
+      alert("로그아웃 성공")
+    } catch (error) {
+      console.error('로그아웃 API 실패:', error);
+    } finally {
+      clearTokens();
+      setIsLoggedIn(false);
+      setAccessToken(null);
+      setUserInfo(null);
+    }
   };
 
   // 토큰 제거 시 상태 즉시 업데이트
   const handleClearTokens = () => {
     clearTokens();
     setIsLoggedIn(false);
+    setAccessToken(null);
+    setUserInfo(null);
   };
 
   return (
     <AuthContext.Provider 
       value={{ 
-        isLoggedIn, 
+        isLoggedIn,
+        accessToken,
+        userInfo,
         saveTokens: handleSaveTokens, 
-        clearTokens: handleClearTokens, 
+        clearTokens: handleClearTokens,
+        logout,
         getAccessToken, 
         getRefreshToken 
       }}

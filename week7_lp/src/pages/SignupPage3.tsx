@@ -3,7 +3,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import {z} from "zod";
 import { useLocation, useNavigate } from 'react-router-dom';
 import Left from '../assets/left.png';
-import Profile from '../assets/profile.png';
+import DefaultUser from '../assets/default-user.png';
 import { postSignup } from "../apis/auth";
 
 const schema = z.object({
@@ -56,10 +56,10 @@ const SignupPage3 = () => {
                         회원가입
                     </h1>
                 </header>
-                <div className="rounded-[100px] bg-gray-400 w-[200px] overflow-hidden">
+                <div className="rounded-[100px] w-[200px] overflow-hidden">
                     <img 
                         className=""
-                        src={Profile} 
+                        src={DefaultUser} 
                         alt="기본 프로필 이미지" 
                     />
                 </div>

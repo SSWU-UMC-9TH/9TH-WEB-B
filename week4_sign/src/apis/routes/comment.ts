@@ -17,13 +17,11 @@ export const createComment = async (lpId: string, data: CreateCommentRequest): P
 };
 
 // 댓글 수정 (실제 백엔드 API)
-export const updateComment = async (commentId: string, data: { content: string }): Promise<CreateCommentResponse> => {
+export const updateComment = async (lpId: string, commentId: string, data: { content: string }): Promise<CreateCommentResponse> => {
   try {
-    console.log('✏️ 댓글 수정 API 요청:', { commentId, data });
-    
-    const response = await axiosInstance.patch(`/v1/comments/${commentId}`, data);
+    console.log('✏️ 댓글 수정 API 요청:', { lpId, commentId, data });
+    const response = await axiosInstance.patch(`/v1/lps/${lpId}/comments/${commentId}`, data);
     console.log('✅ 댓글 수정 API 응답:', response.data);
-    
     return response.data;
   } catch (error) {
     console.error('❌ 댓글 수정 실패:', error);
@@ -32,13 +30,11 @@ export const updateComment = async (commentId: string, data: { content: string }
 };
 
 // 댓글 삭제 (실제 백엔드 API)
-export const deleteComment = async (commentId: string): Promise<{ status: boolean; message: string }> => {
+export const deleteComment = async (lpId: string, commentId: string): Promise<{ status: boolean; message: string }> => {
   try {
-    console.log('🗑️ 댓글 삭제 API 요청:', { commentId });
-    
-    const response = await axiosInstance.delete(`/v1/comments/${commentId}`);
+    console.log('🗑️ 댓글 삭제 API 요청:', { lpId, commentId });
+    const response = await axiosInstance.delete(`/v1/lps/${lpId}/comments/${commentId}`);
     console.log('✅ 댓글 삭제 API 응답:', response.data);
-    
     return response.data;
   } catch (error) {
     console.error('❌ 댓글 삭제 실패:', error);

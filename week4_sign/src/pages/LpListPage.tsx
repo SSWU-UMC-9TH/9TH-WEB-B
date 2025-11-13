@@ -39,7 +39,7 @@ const LpListPage = () => {
     return (
       <div style={{ padding: '20px' }}>
         <ErrorMessage 
-          message="LP ����� �ҷ����µ� �����߽��ϴ�."
+          message="LP 목록을 불러오는 중 오류가 발생했습니다."
           onRetry={() => refetch()}
         />
       </div>
@@ -47,7 +47,7 @@ const LpListPage = () => {
   }
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ paddingTop: 80 }}>
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -55,7 +55,7 @@ const LpListPage = () => {
         marginBottom: '32px'
       }}>
         <h1 style={{ fontSize: '32px', fontWeight: 'bold', color: 'white', margin: 0 }}>
-          {searchQuery ? `"${searchQuery}" �˻����` : 'LP ���'}
+          {searchQuery ? `"${searchQuery}" 검색결과` : 'LP 목록'}
         </h1>
 
         <div style={{ display: 'flex', gap: '12px' }}>
@@ -70,7 +70,7 @@ const LpListPage = () => {
               cursor: 'pointer'
             }}
           >
-            �ֽż�
+            최신순
           </button>
           <button
             onClick={() => setSortBy('popular')}
@@ -83,7 +83,7 @@ const LpListPage = () => {
               cursor: 'pointer'
             }}
           >
-            �α��
+            오래된순
           </button>
         </div>
       </div>
@@ -107,7 +107,7 @@ const LpListPage = () => {
           color: 'white'
         }}>
           <p style={{ fontSize: '18px', marginBottom: '16px' }}>
-            {searchQuery ? '�˻� ����� �����ϴ�.' : 'LP�� �����ϴ�.'}
+            {searchQuery ? '검색 결과가 없습니다.' : 'LP가 없습니다.'}
           </p>
         </div>
       )}

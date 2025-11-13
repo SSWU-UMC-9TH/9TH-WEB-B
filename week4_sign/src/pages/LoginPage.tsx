@@ -2,6 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { postLogout } from '../apis/auth';
 import { LOCAL_STORAGE_KEY } from '../constants/key';
 
@@ -9,8 +10,18 @@ import { LOCAL_STORAGE_KEY } from '../constants/key';
 const LoginPage = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
+
+    // 로그인 useMutation
+    const loginMutation = useMutation({
+        mutationFn: async ({ email, password }: { email: string; password: string }) => {
+            await login({ email, password });
+        },
+        onError: (e: any) => {
+            const serverMsg = e?.response?.data?.message || e?.message;
+            setFormError(serverMsg || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+        },
+    });
 
     const { values, errors, touched, getInputProps } = useForm({
         initialValue: {
@@ -40,20 +51,12 @@ const LoginPage = () => {
         }
     });
 
-    const handleSubmit = async () => {
-        if (isDisabled || isSubmitting) return;
-        setIsSubmitting(true);
+    const handleSubmit = () => {
+        if (isDisabled || loginMutation.isPending) return;
         setFormError(null);
-        try {
-            const email = values.email.trim();
-            const password = values.password; // 비밀번호는 공백도 값으로 인정 (서버 정책에 따름)
-            await login({ email, password });
-        } catch (e: any) {
-            const serverMsg = e?.response?.data?.message || e?.message;
-            setFormError(serverMsg || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
-        } finally {
-            setIsSubmitting(false);
-        }
+        const email = values.email.trim();
+        const password = values.password;
+        loginMutation.mutate({ email, password });
     };
 
     const handleGoogleLogin = async () => {
@@ -151,10 +154,10 @@ const LoginPage = () => {
                 <button
                     type='button'
                     onClick={handleSubmit}
-                    disabled={isDisabled || isSubmitting}
+                    disabled={isDisabled || loginMutation.isPending}
                     className='w-full bg-[#ea00b1] text-white py-3 rounded-md text-m font-medium hover:bg-[#a2007a] transition-colors cursor-pointer disabled:bg-[#1b1b1b]'
                 >
-                    {isSubmitting ? '로그인 중...' : '로그인'}
+                    {loginMutation.isPending ? '로그인 중...' : '로그인'}
                 </button>
                 {formError && (
                     <p className='text-red-500 text-sm mt-2'>{formError}</p>

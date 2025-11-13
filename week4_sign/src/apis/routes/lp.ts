@@ -63,14 +63,12 @@ export const getUserLpList = async (
   }
 };
 
-// LP 생성 (실제 백엔드 API)
+// LP 생성 (실제 백엔드 API, 파일 없이)
 export const createLp = async (data: CreateLpRequest): Promise<CreateLpResponse> => {
   try {
     console.log('LP 생성 요청:', data);
-    
     const response = await axiosInstance.post('/v1/lps', data);
     console.log('LP 생성 API 응답:', response.data);
-    
     return response.data;
   } catch (error) {
     console.error('LP 생성 실패:', error);

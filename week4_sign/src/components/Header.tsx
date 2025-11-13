@@ -1,4 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiMenu } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
@@ -30,13 +31,19 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
     }
   }, [accessToken]);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
       navigate('/');
-    } catch (error) {
-      console.error('로그아웃 실패:', error);
-    }
+    },
+    onError: (error: any) => {
+      alert('로그아웃에 실패했습니다.');
+      console.error('❌ 로그아웃 실패:', error);
+    },
+  });
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
   };
 
   return (
@@ -113,11 +120,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
                 borderRadius: '20px',
                 color: '#ec4899',
                 fontSize: '14px',
-                cursor: 'pointer',
-                fontWeight: '500'
+                cursor: logoutMutation.isPending ? 'not-allowed' : 'pointer',
+                fontWeight: '500',
+                opacity: logoutMutation.isPending ? 0.6 : 1
               }}
+              disabled={logoutMutation.isPending}
             >
-              로그아웃
+              {logoutMutation.isPending ? '로그아웃 중...' : '로그아웃'}
             </button>
           </>
         ) : (

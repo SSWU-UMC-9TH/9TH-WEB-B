@@ -1,4 +1,4 @@
-export type UserSignupInformation = {
+﻿export type UserSignupInformation = {
   email: string;
   password: string;
   confirmPassword: string;
@@ -26,4 +26,6 @@ export function validateUser(values: UserSignupInformation) {
 
   return errors;
 }
+
+
 

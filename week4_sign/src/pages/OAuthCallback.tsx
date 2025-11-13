@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { LOCAL_STORAGE_KEY } from "../constants/key";
 
@@ -26,3 +26,5 @@ export default function OAuthCallback() {
 
   return null;
 }
+
+

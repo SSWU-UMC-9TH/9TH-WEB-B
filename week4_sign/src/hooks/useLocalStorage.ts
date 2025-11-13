@@ -1,41 +1,34 @@
-export const useLocalStorage = (key: string) => {
-    // 문자열 토큰 등은 그대로 저장하고, 객체/배열만 JSON 직렬화
-    const setItem = (value: unknown) => {
-        try {
-            if (typeof value === 'string') {
-                window.localStorage.setItem(key, value);
-            } else {
-                window.localStorage.setItem(key, JSON.stringify(value));
-            }
-        } catch(error) {
-            console.log(error);
-        }
-    }
+﻿import { useState, useEffect } from 'react';
 
-    const getItem = () => {
-        try {
-            const item = window.localStorage.getItem(key);
-            if (item == null) return null;
-            // JSON 형태면 파싱하고, 아니면 원본문자열 반환
-            try {
-                const parsed = JSON.parse(item);
-                return parsed;
-            } catch {
-                return item;
-            }
-        } catch(error) {
-            console.log(error);
-            return null;
-        }
+export function useLocalStorage<T>(key: string, initialValue: T) {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === 'undefined') {
+      return initialValue;
     }
-
-    const removeItem = () => {
-        try {
-            window.localStorage.removeItem(key);
-        } catch(error) {
-            console.log(error);
-        }
+    
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error('Error reading localStorage key "' + key + '":', error);
+      return initialValue;
     }
+  });
 
-    return {setItem, getItem, removeItem};
+  const setValue = (value: T | ((val: T) => T)) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      }
+    } catch (error) {
+      console.error('Error setting localStorage key "' + key + '":', error);
+    }
+  };
+
+  return [storedValue, setValue] as const;
 }
+
+

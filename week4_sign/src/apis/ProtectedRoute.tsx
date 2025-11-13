@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+﻿import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 type Props = { redirectTo?: string };
@@ -15,3 +15,5 @@ export default function ProtectedRoute({ redirectTo = "/login" }: Props) {
   // ✅ 토큰이 있으면 실제 내부 페이지 렌더
   return <Outlet />;
 }
+
+

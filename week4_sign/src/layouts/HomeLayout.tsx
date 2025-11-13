@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 
 const HomeLayout = () => {
@@ -37,3 +37,4 @@ const HomeLayout = () => {
 }
 
 export default HomeLayout
+

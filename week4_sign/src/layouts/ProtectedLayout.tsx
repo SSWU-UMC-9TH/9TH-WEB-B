@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+﻿import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"
 import { LOCAL_STORAGE_KEY } from "../constants/key";
 import { useEffect, useState } from "react";
@@ -35,3 +35,4 @@ const ProtectedLayout = () => {
 }
 
 export default ProtectedLayout
+

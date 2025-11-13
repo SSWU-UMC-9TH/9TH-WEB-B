@@ -37,3 +37,9 @@ export const deleteLike = async ({lpId}: RequestLpDto): Promise<ResponseLpListDt
 
     return data;
 }
+
+export const postLp = async (lp: Lp): Promise<CommonResponse<Lp>> => {
+    const {data} = await axiosInstance.post("/v1/lps", lp);
+
+    return data;
+}

@@ -3,10 +3,12 @@ import { Outlet } from 'react-router-dom'
 import FloatingButton from '../components/FloatingButton';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
+import Modal from '../components/Modal';
 
 const HomeLayout = () => {
     const DESKTOP_BREAKPOINT = 768;
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleSidebarToggle = () => {
         setIsSidebarOpen(prev => !prev);
@@ -41,21 +43,6 @@ const HomeLayout = () => {
             window.removeEventListener('resize', handleResize);
         };
     }, [handleResize])
-        
-
-    useEffect(() => {
-        if (isDesktopModeRef.current) {
-            setIsSidebarOpen(true);
-        } else {
-            setIsSidebarOpen(false);
-        }
-        
-        window.addEventListener('resize', handleResize);
-        
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, [handleResize])
 
     return (
         <div className='h-dvh flex flex-col'>
@@ -70,7 +57,10 @@ const HomeLayout = () => {
                 </main>
             </div>
             <footer className='bg-black'>푸터</footer>
-            <FloatingButton />
+            <FloatingButton onClick={() => setIsModalOpen(true)} />
+            {isModalOpen && (
+                <Modal onClose={() => setIsModalOpen(false)} />
+            )}
         </div>
     )
 }

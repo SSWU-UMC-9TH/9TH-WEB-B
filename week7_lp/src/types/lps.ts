@@ -1,7 +1,7 @@
 import type { CommonResponse, CursorBasedResponse } from "./common";
 
 export type Tag = {
-    id: number;
+    // id: number;
     name: string;
 }
 

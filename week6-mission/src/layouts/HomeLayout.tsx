@@ -5,6 +5,8 @@ import { FiSearch, FiUser } from "react-icons/fi";
 
 
 const HomeLayout = () => {
+
+  
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,7 +41,7 @@ const HomeLayout = () => {
         <nav className="flex items-center justify-between p-4 bg-black text-white">
         {/* 왼쪽: 햄버거 + 로고 */}
         <div className="flex items-center space-x-3">
-          <button onClick={() => setIsSidebarOpen(true)}> <svg width="24" height="24" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M7.95 11.95h32m-32 12h32m-32 12h32"/></svg></button>
+          <button onClick={() => setIsSidebarOpen(true)}> <svg width="24" height="24" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M7.95 11.95h32m-32 12h32m-32 12h32"/></svg></button>
           <div
             onClick={() => navigate("/")}
             className="text-gray-50 font-bold text-lg cursor-pointer"

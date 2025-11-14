@@ -10,7 +10,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SearchPage from './pages/SearchPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import LpDetailPage from './pages/LpDetailPage';   
+import LpDetailPage from './pages/LpDetailPage';  
+import LpCommentsPage from './pages/LpCommentsPage';
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
         ),
       },
       { path: '/lps/:lpid', element: <LpDetailPage /> }, 
+      { path: '/lps/:lpid/comments', element: <LpCommentsPage /> }
     ],
   },
 ]);

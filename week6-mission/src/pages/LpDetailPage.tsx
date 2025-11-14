@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { QUERY_KEYS } from "../constants/key";
+import { useNavigate } from "react-router-dom";
 
 const getLpDetail = async (lpid: string) => {
   const { data } = await axios.get(
@@ -11,6 +12,8 @@ const getLpDetail = async (lpid: string) => {
 };
 
 const LpDetailPage = () => {
+  const navigate = useNavigate();   // ⭐ 올바른 위치로 이동
+
   const { lpid } = useParams<{ lpid: string }>();
 
   const {
@@ -18,7 +21,7 @@ const LpDetailPage = () => {
     isPending,
     isError,
   } = useQuery({
-    queryKey: [QUERY_KEYS.lps, lpid], // ✅ 키에 lpid 포함
+    queryKey: [QUERY_KEYS.lps, lpid],
     queryFn: () => getLpDetail(lpid as string),
     enabled: !!lpid,
     staleTime: 1000 * 60 * 5,
@@ -45,19 +48,19 @@ const LpDetailPage = () => {
             </p>
           </div>
 
-          {/* 수정/삭제/좋아요 버튼 */}
-          <div className="flex items-center gap-3 text-gray-300">
-            <button className="hover:text-blue-400 transition">
-              ✏️ 수정
+          <div className="flex items-center gap-4 text-gray-300 flex-row whitespace-nowrap">
+            <button className="hover:text-blue-400 transition">수정</button>
+            <button className="hover:text-blue-500 transition">삭제</button>
+
+            <button
+              onClick={() => navigate(`/lps/${lp.id}/comments`)}
+              className="hover:text-blue-400 transition"
+            >
+              댓글보기
             </button>
-            <button className="hover:text-blue-500 transition">
-              🗑 삭제
-            </button>
-            
           </div>
         </header>
 
-        {/* 썸네일 */}
         <div className="mb-6 flex justify-center">
           <img
             src={lp.thumbnail}
@@ -66,10 +69,10 @@ const LpDetailPage = () => {
           />
         </div>
 
-        {/* 본문 */}
         <article className="whitespace-pre-wrap text-gray-300 leading-relaxed border-t border-gray-700 pt-6">
           {lp.content}
         </article>
+
         <div className="flex justify-center mt-6">
           <button className="flex items-center gap-1 hover:text-blue-500 transition">
             <span className="text-3xl">❤️</span> <span>{lp.likes.length}</span>

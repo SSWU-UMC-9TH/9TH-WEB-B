@@ -14,7 +14,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const menuItems = [
     { path: '/', icon: FiHome, label: '홈' },
-    { path: '/', icon: FiSearch, label: '찾기' },
+    { path: '/search', icon: FiSearch, label: '찾기' },
     { path: '/mypage', icon: FiUser, label: '마이페이지' }
   ];
 

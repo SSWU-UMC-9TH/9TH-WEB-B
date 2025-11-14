@@ -10,14 +10,21 @@ interface LpCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (form: FormData) => void;
+  initial?: {
+    title?: string;
+    description?: string;
+    tags?: string[];
+    imageUrl?: string;
+  };
 }
 
-const LpCreateModal: React.FC<LpCreateModalProps> = ({ isOpen, onClose, onSubmit }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [tags, setTags] = useState<Tag[]>([]);
+const LpCreateModal: React.FC<LpCreateModalProps> = ({ isOpen, onClose, onSubmit, initial }) => {
+  const [title, setTitle] = useState(initial?.title || '');
+  const [description, setDescription] = useState(initial?.description || '');
+  const [tags, setTags] = useState<Tag[]>(initial?.tags ? initial.tags.map((t, i) => ({ id: i, text: t })) : []);
   const [tagInput, setTagInput] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState(initial?.imageUrl || '');
 
   const handleAddTag = () => {
     if (tagInput.trim() && !tags.some(t => t.text === tagInput.trim())) {
@@ -33,6 +40,7 @@ const LpCreateModal: React.FC<LpCreateModalProps> = ({ isOpen, onClose, onSubmit
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
+      setImageUrl('');
     }
   };
 
@@ -42,7 +50,11 @@ const LpCreateModal: React.FC<LpCreateModalProps> = ({ isOpen, onClose, onSubmit
     formData.append('title', title);
     formData.append('description', description);
     tags.forEach(tag => formData.append('tags', tag.text));
-    if (file) formData.append('image', file);
+    if (file) {
+      formData.append('image', file);
+    } else if (imageUrl) {
+      formData.append('imageUrl', imageUrl);
+    }
     onSubmit(formData);
   };
 
@@ -80,6 +92,11 @@ const LpCreateModal: React.FC<LpCreateModalProps> = ({ isOpen, onClose, onSubmit
           />
           <button type="button" onClick={handleAddTag} className="bg-pink-500 text-white rounded px-2 py-1 text-xs">추가</button>
         </div>
+        {imageUrl && (
+          <div className="mb-2">
+            <img src={imageUrl} alt="썸네일 미리보기" style={{ maxWidth: 120, maxHeight: 120, borderRadius: 8, marginBottom: 8, background: '#222' }} />
+          </div>
+        )}
         <input type="file" accept="image/*" onChange={handleFileChange} />
         <button type="submit" className="bg-pink-500 text-white rounded px-4 py-2 mt-2">등록</button>
       </form>

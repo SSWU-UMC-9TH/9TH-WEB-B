@@ -480,6 +480,12 @@ const LpDetailPage = () => {
         <LpCreateModal
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
+          initial={{
+            title: lp.title,
+            description: lp.content,
+            tags: lp.tags.map((t: any) => t.name),
+            imageUrl: lp.thumbnail
+          }}
           onSubmit={(formData) => {
             // formData에서 값 추출 후 editLpMutation.mutate 호출
             const data: any = {};
@@ -487,6 +493,12 @@ const LpDetailPage = () => {
               if (key === 'tags') {
                 if (!data.tags) data.tags = [];
                 data.tags.push(value);
+              } else if (key === 'description') {
+                data.content = value;
+              } else if (key === 'imageUrl') {
+                data.thumbnail = value;
+              } else if (key === 'image') {
+                // 파일 업로드는 별도 처리 필요(여기선 URL만 전달)
               } else {
                 data[key] = value;
               }

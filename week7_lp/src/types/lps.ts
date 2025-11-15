@@ -58,3 +58,10 @@ export type ResponseLpDto = CommonResponse<Lp>;
 export type RequestLpDto = {
     lpId: number;
 }
+
+export type RequestPostCommentDto = {
+    content: string;
+    lpId: number;
+}
+
+export type ResponseCommentDto = CommonResponse<Comment>;

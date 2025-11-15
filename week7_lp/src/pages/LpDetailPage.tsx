@@ -13,18 +13,19 @@ import useGetMyInfo from '../hooks/queries/useGetMyInfo';
 import { useAuth } from '../context/AuthContext';
 import usePostLike from '../hooks/mutations/usePostLike';
 import useDeleteLike from '../hooks/mutations/useDeleteLike';
+import { usePostComment } from '../hooks/mutations/usePostComment';
 
 const LpDetailPage = () => {
     const { lpId } = useParams<{ lpId: string }>();
     const {accessToken} = useAuth();
 
-    const [order, setOrder] = useState(PAGINATION_ORDER.desc);
+    const [order, setOrder]  = useState(PAGINATION_ORDER.desc);
     const [commentInput, setCommentInput] = useState('');
 
     const id = lpId ? parseInt(lpId, 10) : 0;
     const { data: lp, isPending: isLpPending, isError: isLpError } = useGetLpDetail(id);
     console.log('LP 상세 정보:', lp);
-
+    const {mutate: commentMutate} = usePostComment();
 
     const { 
         data: comments, 
@@ -83,11 +84,14 @@ const LpDetailPage = () => {
     }
 
     const handleCommentSubmit = () => {
-        const trimmedComment = commentInput.trim();
-        if (trimmedComment.length===0) {
+        if (commentInput.length===0) {
             alert('댓글을 작성해주세요.');
             return;
         }
+        commentMutate({
+            lpId: id,
+            content: commentInput,
+        })
         setCommentInput('');
     }
 

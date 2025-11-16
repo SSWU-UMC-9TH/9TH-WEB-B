@@ -16,6 +16,18 @@ export const postLp = async (lp: Lp): Promise<CommonResponse<Lp>> => {
     return data;
 }
 
+export const updateLp = async (lpId: number, lp: Lp): Promise<CommonResponse<Lp>> => {
+    const {data} = await axiosInstance.patch(`/v1/lps/${lpId}`, lp);
+
+    return data;
+}
+
+export const deleteLp = async (lpId: number): Promise<void> => {
+    const {data} = await axiosInstance.delete(`/v1/lps/${lpId}`);
+
+    return data;
+}
+
 export const getLpDetail = async (lpId: number): Promise<CommonResponse<Lp>> => {
     const {data} = await axiosInstance.get(`/v1/lps/${lpId}`);
 

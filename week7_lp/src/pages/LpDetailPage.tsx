@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useGetLpDetail } from './../hooks/queries/useGetLpDetail';
 import Pen from '../assets/pen.png';
 import Garbagecan from '../assets/garbagecan.png';
-import {Heart} from 'lucide-react';
+import Picture from '../assets/picture.png';
+import Close from '../assets/close.png';
+import {Check, Heart} from 'lucide-react';
 import { PAGINATION_ORDER } from '../enums/common';
 import { useInView } from 'react-intersection-observer';
 import LpComment from '../components/LpComment/LpComment';
@@ -14,6 +16,8 @@ import { useAuth } from '../context/AuthContext';
 import usePostLike from '../hooks/mutations/usePostLike';
 import useDeleteLike from '../hooks/mutations/useDeleteLike';
 import { usePostComment } from '../hooks/mutations/usePostComment';
+import { useDeleteLp } from '../hooks/mutations/useDeleteLp';
+import { useUpdateLp } from '../hooks/mutations/useUpdateLp';
 
 const LpDetailPage = () => {
     const { lpId } = useParams<{ lpId: string }>();
@@ -26,6 +30,95 @@ const LpDetailPage = () => {
     const { data: lp, isPending: isLpPending, isError: isLpError } = useGetLpDetail(id);
     console.log('LP 상세 정보:', lp);
     const {mutate: commentMutate} = usePostComment();
+    
+    const [isLpEditing, setIsLpEditing] = useState(false);
+    const [editedLp, setEditedLp] = useState(lp?.data);
+    const [lpTagInput, setLpTagInput] = useState('');
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [newImageFile, setNewImageFile] = useState<File | null>(null);
+
+    const handleTitle = (e) => {
+        setEditedLp(prev => ({
+            ...(prev || {}),
+            title: e.target.value
+        }))
+    }
+
+    const handleContent = (e) => {
+        setEditedLp(prev => ({
+            ...(prev || {}),
+            content: e.target.value
+        }))
+    }
+
+    const handleImageChange = (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setNewImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEditedLp(prev => ({ 
+                    ...(prev || {}),
+                    thumbnail: reader.result as string
+                }));
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    const handleImageClick = () => {
+        fileInputRef.current?.click();
+    }
+
+    const addTag = () => {
+        if (lpTagInput && editedLp && !editedLp.tags.some(t => t.name === lpTagInput)) {
+            const newTag = { name: lpTagInput }; 
+            setEditedLp(prev => ({
+                ...(prev || {}),
+                tags: [...(prev?.tags || []), newTag]
+            }));
+            setLpTagInput('');
+        }
+    };
+
+    const deleteTag = (deleteTag) => {
+        setEditedLp(prev => ({
+            ...(prev || {}),
+            tags: prev?.tags.filter(tag => tag.name !== deleteTag) || []
+        }));
+    };
+
+    const {mutate: updateLpMutate} = useUpdateLp();
+    const handleUpdateLp = () => {
+        if (!editedLp || !editedLp.title || !editedLp.content) {
+            alert("제목과 내용을 작성해주세요.");
+            return;
+        }
+        setIsLpEditing(false);
+        updateLpMutate({
+            lpId: id,
+            lp: {
+                title: editedLp.title,
+                content: editedLp.content,
+                thumbnail: editedLp.thumbnail, 
+                tags: editedLp.tags.map(t => t.name),
+                published: editedLp.published,
+            }
+        })
+    }
+
+    useEffect(() => {
+        if (lp?.data) {
+            setEditedLp(lp.data);
+        }
+    }, [lp?.data]);
+
+    const {mutate: deleteLpMutate} = useDeleteLp();
+    const handleDeleteLp = () => {
+        deleteLpMutate({
+            lpId
+        })
+    }
 
     const { 
         data: comments, 
@@ -94,7 +187,6 @@ const LpDetailPage = () => {
         })
         setCommentInput('');
     }
-
     
     if (isLpPending || isCommentsPending) {
         return <div>Loading...</div>
@@ -110,50 +202,130 @@ const LpDetailPage = () => {
                 <header className='flex justify-between items-center mb-[20px]'>
                     <div className='flex gap-[5px] items-center'>
                         <img src={lp.data.author.avatar} 
-                        alt={lp.data.author.name} 
-                        className='w-[30px] rounded-full'
+                            alt={lp.data.author.name} 
+                            className='w-[30px] rounded-full'
                         />
                         <p>{lp.data.author.name}</p>
                     </div>
                     <p>{formatRelativeTime(lp.data.createdAt)}</p>
                 </header>
-                <div className='flex justify-between items-center mb-[40px]'>
-                    <p className='text-[18px]'>{lp.data.title}</p>
-                    <div className='flex gap-[5px]'>
-                        <button>
-                            <img 
-                                src={Pen} 
-                                alt="펜 아이콘"
-                                className='w-[25px] cursor-pointer' 
-                            />
-                        </button>
-                        <button>
-                            <img 
-                                src={Garbagecan} 
-                                alt="휴지통 아이콘"
-                                className='w-[25px] cursor-pointer' 
-                            />
-                        </button>
-                    </div>
+                <div className='flex justify-between items-center mb-[40px] gap-2'>
+                    {isLpEditing ? (
+                        <input 
+                            type="text" 
+                            value={editedLp?.title || lp?.data.title}
+                            onChange={handleTitle}
+                            className='text-[18px] w-full'
+                        />
+                    ) : (
+                        <p className='text-[18px]'>{lp.data.title}</p>
+                    )}
+                    {me?.data.email===lp.data.author.email && (
+                        <div className='flex gap-[5px]'>
+                            {isLpEditing ? (
+                                <>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleImageChange}
+                                        accept="image/*"
+                                        className='hidden'
+                                    />
+                                    <button onClick={handleImageChange}>
+                                        <img 
+                                            src={Picture} 
+                                            alt="사진 아이콘"
+                                            className='w-[25px] cursor-pointer' 
+                                            onClick={isLpEditing ? handleImageClick : undefined}
+                                        />
+                                    </button>
+                                    <button onClick={handleUpdateLp}>
+                                        <Check className='w-[25px] cursor-pointer' />
+                                    </button>
+                                </>
+                            ) : (
+                                <button onClick={() => setIsLpEditing(true)}>
+                                    <img 
+                                        src={Pen} 
+                                        alt="펜 아이콘"
+                                        className='w-[25px] cursor-pointer' 
+                                    />
+                                </button>
+                            )}
+                            <button onClick={handleDeleteLp}>
+                                <img 
+                                    src={Garbagecan} 
+                                    alt="휴지통 아이콘"
+                                    className='w-[25px] cursor-pointer' 
+                                />
+                            </button>
+                        </div>
+                    )}
                 </div>
                 <div className='shadow-xl shadow-black p-[20px] w-full max-w-lg mx-auto aspect-square'>
                     <img 
-                        src={lp.data.thumbnail} 
+                        src={editedLp?.thumbnail || lp.data.thumbnail} 
                         alt={`${lp.data.title}의 이미지`}
                         className='rounded-full w-full h-full object-cover border border-black'
                     />
                 </div>
-                <p className='mt-[30px]'>{lp.data.content}</p>
-                <div className='flex justify-center p-[20px] flex-wrap'>
-                    {lp.data.tags.length > 0 && lp.data.tags.map((tag, index) => (
-                        <div 
-                            key={index}
-                            className='rounded-[20px] bg-[#47445b] px-[10px] py-[5px] m-[5px]'
-                        >
-                            #{tag.name}
+                {isLpEditing ? (
+                    <input 
+                        type="text" 
+                        value={editedLp?.content || lp?.data.content}
+                        onChange={handleContent}
+                        className='my-[30px] w-full'
+                    />
+                ) : (
+                    <p className='mt-[30px]'>{lp.data.content}</p>
+                )}
+                {isLpEditing ? (
+                    <>
+                        <div className='flex gap-2'>
+                            <input 
+                                type="text" 
+                                value={lpTagInput}
+                                onChange={(e) => setLpTagInput(e.target.value)}
+                                placeholder='LP Tag'
+                                className='border border-white rounded-lg p-[5px] text-white flex-1 w-full'
+                            />
+                            <button 
+                                className='bg-[#808080] rounded-lg text-white px-[10px] py-[5px] cursor-pointer'
+                                onClick={addTag}
+                            >
+                                Add
+                            </button>
                         </div>
-                    ))}
-                </div>
+                        <div className='flex gap-2 flex-wrap mt-[20px]'>
+                            {editedLp?.tags.map((tag, index) => (
+                                <div 
+                                    key={index}
+                                    className='bg-[#282828] text-white rounded-lg flex items-center gap-1 p-2 text-[10px]'
+                                >
+                                    #{tag.name}
+                                    <button onClick={() => deleteTag(tag.name)}>
+                                        <img 
+                                            src={Close} 
+                                            alt="닫기 아이콘" 
+                                            className='w-[10px] cursor-pointer'
+                                        />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                ) : (
+                    <div className='flex justify-center p-[20px] flex-wrap'>
+                        {lp.data.tags.length > 0 && lp.data.tags.map((tag, index) => (
+                            <div 
+                                key={index}
+                                className='rounded-[20px] bg-[#47445b] px-[10px] py-[5px] m-[5px]'
+                            >
+                                #{tag.name}
+                            </div>
+                        ))}
+                    </div>
+                )}
                 <div className='flex items-center justify-center gap-1'>
                     <button onClick={isLiked ? handleDislikeLp : handleLikeLp} className='cursor-pointer'>
                         <Heart color={isLiked ? "red" : "white"} fill={isLiked ? "red" : "transparent"} />

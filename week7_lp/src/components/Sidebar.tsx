@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Search from '../assets/search.png';
 import User from '../assets/user.png';
 import { useNavigate } from 'react-router-dom';
+import WithdrawalModal from './WithdrawalModal';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -12,6 +13,8 @@ const Sidebar = ({isOpen, onClose}: SidebarProps) => {
     const DESKTOP_BREAKPOINT = 768;
     const sidebarRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -64,7 +67,18 @@ const Sidebar = ({isOpen, onClose}: SidebarProps) => {
                     />
                     <p>마이페이지</p>
                 </button>
+                <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className='fixed bottom-[20px] cursor-pointer'
+                >
+                    탈퇴하기
+                </button>
             </div>
+            {isModalOpen && (
+                <WithdrawalModal
+                    onClose={() => setIsModalOpen(false)}
+                />
+            )}
         </>
     )
 }

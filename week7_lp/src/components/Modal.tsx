@@ -63,7 +63,7 @@ const Modal = ({onClose}: ModalProps) => {
     }
 
     return (
-        <div className='bg-[#434343] w-[300px] z-100 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+        <div className='bg-[#434343] w-[300px] z-1000 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
             rounded-lg p-[20px] flex flex-col gap-[10px]'>
             <button 
                 onClick={onClose}

@@ -45,12 +45,12 @@ const MyPage = () => {
     }
 
     const handleUpdateProfile = async () => {
-        if (!name) {
+        if (!name || name.trim().length === 0) {
             alert('이름을 필수로 작성해주세요.');
             return;
         }
         profileUpdateMute({
-            name,
+            name: name.trim(),
             bio,
             avatar
         });

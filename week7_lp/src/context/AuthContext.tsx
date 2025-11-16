@@ -1,20 +1,17 @@
-import { postLogout, postSignin } from "../apis/auth";
+import { postLogout } from "../apis/auth";
 import { LOCAL_STORAGE_KEY } from "../constants/key";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import type { RequestSigninDto } from "../types/auth";
 import { createContext, useContext, useState, type PropsWithChildren } from "react";
 
 interface AuthContextType {
     accessToken: string | null;
     refreshToken: string | null;
-    login: (SigninData: RequestSigninDto, redirectPath: string) => Promise<void>;
     logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
     accessToken: null,
     refreshToken: null,
-    login: async () => {},
     logout: async () => {},
 })
 
@@ -37,29 +34,6 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         getRefreshTokenFromStorage(),
     );
 
-    const login = async (signinData: RequestSigninDto, redirectPath: string) => {
-        try {
-            const {data} = await postSignin(signinData);
-
-            if (data) {
-                const newAccessToken = data.accessToken;
-                const newRefreshToken = data.refreshToken;
-                
-                setAccessTokenInStorage(newAccessToken);
-                setRefreshTokenInStorage(newRefreshToken);
-
-                setAccessToken(newAccessToken);
-                setRefreshToken(newRefreshToken);
-                alert('로그인 성공');
-                // window.location.href='/my';
-                window.location.href = redirectPath;
-            }
-        } catch(error) {
-            console.log('로그인 오류', error);
-            alert('로그인 실패');
-        }
-    }
-
     const logout = async () => {
         try {
             await postLogout();
@@ -81,7 +55,7 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         }
     }
     return (
-        <AuthContext.Provider value={{accessToken, refreshToken, login, logout}}>
+        <AuthContext.Provider value={{accessToken, refreshToken, logout}}>
             {children}
         </AuthContext.Provider>
     )

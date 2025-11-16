@@ -8,7 +8,7 @@ export const postSignup = async (body: RequestSignupDto):Promise<ResponseSignupD
 }
 
 export const postSignin = async (body: RequestSigninDto):Promise<ResponseSigninDto> => {
-    const { data } = await axiosInstance.post("/v1/auth/signin", body);
+    const { data } = await axiosInstance.post("/v1/auth/signin", {email: body.email, password: body.password});
 
     return data;
 }

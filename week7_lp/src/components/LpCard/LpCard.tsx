@@ -7,7 +7,7 @@ interface LpCardProps {
 }
 
 const LpCard = ({lp}: LpCardProps) => {
-    console.log('lp 정보', lp);
+    // console.log('lp 정보', lp);
 
     const navigate = useNavigate();
 

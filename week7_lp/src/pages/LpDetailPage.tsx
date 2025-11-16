@@ -5,6 +5,7 @@ import Pen from '../assets/pen.png';
 import Garbagecan from '../assets/garbagecan.png';
 import Picture from '../assets/picture.png';
 import Close from '../assets/close.png';
+import DefaultUser from '../assets/default-user.png';
 import {Check, Heart} from 'lucide-react';
 import { PAGINATION_ORDER } from '../enums/common';
 import { useInView } from 'react-intersection-observer';
@@ -201,9 +202,9 @@ const LpDetailPage = () => {
             <div className='bg-[#353535] rounded-lg px-[50px] py-[20px] w-full max-w-3xl mx-auto m-[20px]'>
                 <header className='flex justify-between items-center mb-[20px]'>
                     <div className='flex gap-[5px] items-center'>
-                        <img src={lp.data.author.avatar} 
+                        <img src={lp.data.author.avatar || DefaultUser} 
                             alt={lp.data.author.name} 
-                            className='w-[30px] rounded-full'
+                            className='w-[30px] rounded-full h-[30px] object-cover'
                         />
                         <p>{lp.data.author.name}</p>
                     </div>

@@ -4,10 +4,9 @@ import { type UserSigninInformation, validateSignin } from '../utils/validate';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Left from '../assets/left.png';
 import Google from '../assets/google.png';
-import { useAuth } from '../context/AuthContext';
+import { usePostSignin } from '../hooks/mutations/usePostSignin';
 
 const LoginPage = () => {
-    const {login} = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -21,8 +20,13 @@ const LoginPage = () => {
         validate: validateSignin,
     })
 
+    const {mutate: postSigninMutate} = usePostSignin();
+
     const handleSubmit = async () => {
-        await login(values, from);
+        postSigninMutate({
+            ...values,
+            redirectPath: from,
+        });
     }
 
     const handleGoogleLogin = () => {

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import type { ResponseMyInfoDto } from '../types/auth';
-import { getMyInfo } from '../apis/auth';
 import Search from '../assets/search.png';
 import { usePostLogout } from '../hooks/mutations/usePostLogout';
+import useGetMyInfo from '../hooks/queries/useGetMyInfo';
 
 interface NavbarProps {
     onSidebarClick: () => void;
@@ -13,7 +13,6 @@ interface NavbarProps {
 const Navbar = ({onSidebarClick}: NavbarProps) => {
     const navigate = useNavigate();
     const { accessToken } = useAuth();
-    const [data, setData] = useState<ResponseMyInfoDto>([]);
 
     const {mutate: postLogoutMutate} = usePostLogout();
 
@@ -21,14 +20,8 @@ const Navbar = ({onSidebarClick}: NavbarProps) => {
         postLogoutMutate();
     }
 
-    useEffect(() => {
-        const getData = async () => {
-            const response = await getMyInfo();
-            console.log(response);
-            setData(response);
-        }
-        getData();
-    }, []);
+    const { data: myInfoData } = useGetMyInfo(accessToken);
+    const myInfo = myInfoData?.data;
 
     return (
         <nav className='bg-[#161616] flex items-center justify-between h-[80px] p-[20px]'>
@@ -72,7 +65,7 @@ const Navbar = ({onSidebarClick}: NavbarProps) => {
                         <div 
                             className='text-white px-[10px] py-[5px] rounded-[5px] font-semibold ml-[10px]'
                         >
-                            {data.data?.name}님 반갑습니다.
+                            {myInfo?.name}님 반갑습니다.
                         </div>
                         <button 
                             className='text-white bg-black px-[10px] py-[5px] rounded-[5px] font-semibold cursor-pointer ml-[10px]'

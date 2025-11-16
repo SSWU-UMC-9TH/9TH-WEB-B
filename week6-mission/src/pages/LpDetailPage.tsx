@@ -1,8 +1,9 @@
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { QUERY_KEYS } from "../constants/key";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const getLpDetail = async (lpid: string) => {
   const { data } = await axios.get(
@@ -12,9 +13,28 @@ const getLpDetail = async (lpid: string) => {
 };
 
 const LpDetailPage = () => {
-  const navigate = useNavigate();   // ⭐ 올바른 위치로 이동
+  const navigate = useNavigate();   
 
   const { lpid } = useParams<{ lpid: string }>();
+
+  const queryClient = useQueryClient();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+
+  const updateLpMutation = useMutation({
+    mutationFn: async ({ id, title }: { id: number; title: string }) => {
+      const { data } = await axios.patch(
+        `${import.meta.env.VITE_SERVER_API_URL}/v1/lps/${id}`,
+        { title }
+      );
+      return data;
+    },
+    onSuccess: async (data) => {
+  queryClient.setQueryData([QUERY_KEYS.lps, lpid], () => data.data);
+  setIsEditing(false);
+},
+  });
 
   const {
     data,
@@ -42,15 +62,36 @@ const LpDetailPage = () => {
         {/* 상단: 제목 + 작성자 + 날짜 + 버튼 */}
         <header className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">{lp.title}</h1>
+            {isEditing ? (
+              <input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="w-130 p-2 rounded bg-white text-black border border-gray-400"
+                autoFocus
+              />
+            ) : (
+              <h1 className="text-4xl font-bold mb-2">{lp.title}</h1>
+            )}
             <p className="text-sm text-gray-400">
               업로드일: {new Date(lp.createdAt).toLocaleDateString()}
             </p>
           </div>
 
           <div className="flex items-center gap-4 text-gray-300 flex-row whitespace-nowrap">
-            <button className="hover:text-blue-400 transition">수정</button>
-            <button className="hover:text-blue-500 transition">삭제</button>
+            <button
+              className="hover:text-blue-400 transition"
+              onClick={() => {
+                if (!isEditing) {
+                  setIsEditing(true);
+                  setEditTitle(lp.title);
+                } else {
+                  updateLpMutation.mutate({ id: lp.id, title: editTitle });
+                }
+              }}
+            >
+              {isEditing ? "✔️" : "✏️"}
+            </button>
+            <button className="hover:text-blue-500 transition">🗑️</button>
 
             <button
               onClick={() => navigate(`/lps/${lp.id}/comments`)}

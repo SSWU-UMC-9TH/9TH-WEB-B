@@ -13,6 +13,7 @@ interface CommentType {
   content: string;
   createdAt: string;
   author: CommentAuthor | null;
+  authorId: number;
 }
 
 interface CommentListProps {

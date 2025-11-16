@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import useGetLpList from "../hooks/queries/useGetLpList";
 import { useEffect, useRef, useState } from "react";
 import LpCardSkeletonList from "../components/LpCardSkeletonList";
-import LpCard from "../components/Lpcard";
+import LpCard from "../components/LpCard";
 
 const Homepage = () => {
   const navigate = useNavigate();

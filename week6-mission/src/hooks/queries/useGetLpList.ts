@@ -3,6 +3,7 @@ import type { PaginationDto } from "../../types/common";
 import { getLpList } from "../../apis/lp";
 import { QUERY_KEYS } from "../../constants/key";
 
+
 type UseGetLpListProps = Omit<PaginationDto, "cursor">;
 
 function useGetLpList({ limit, search, order }: UseGetLpListProps) {

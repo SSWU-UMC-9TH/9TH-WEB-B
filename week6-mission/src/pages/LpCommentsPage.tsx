@@ -54,9 +54,8 @@ const LpCommentsPage = () => {
 
       {/* 댓글 입력 */}
       <CommentInput
-        lpId={Number(lpid)}
-        onSuccess={() => window.location.reload()}
-      />
+    lpId={Number(lpid)}
+  />
 
       {/* 정렬 버튼 */}
       <div className="flex justify-end mb-4">

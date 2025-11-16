@@ -2,12 +2,15 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { FiSearch, FiUser } from "react-icons/fi";
+import FloatingButton from '../components/lp/FloatingBtn';
+import LpWriteModal from '../components/lp/LpWriteModal';
 
 
 const HomeLayout = () => {
-
+const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken"));
@@ -114,11 +117,45 @@ const HomeLayout = () => {
           </li>
         </ul>
 
-        <div className="absolute bottom-8 left-6 text-gray-400 text-sm cursor-pointer hover:text-blue-400">
+        <button
+          className="absolute bottom-8 left-6 text-gray-400 text-sm cursor-pointer hover:text-blue-400"
+          onClick={() => setIsDeleteModalOpen(true)}
+        >
           탈퇴하기
-        </div>
+        </button>
       </div>
 
+    {isDeleteModalOpen && (
+      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+        <div className="bg-gray-800 text-white p-8 rounded-lg w-80 relative">
+          <button
+            className="absolute top-3 right-3 text-xl"
+            onClick={() => setIsDeleteModalOpen(false)}
+          >
+            ✕
+          </button>
+          <p className="text-center mb-6">정말 탈퇴하시겠습니까?</p>
+          <div className="flex justify-center gap-4">
+            <button
+              className="px-4 py-2 bg-gray-300 text-black rounded"
+              onClick={() => {
+                // Add API call later
+                alert("탈퇴되었습니다.");
+                setIsDeleteModalOpen(false);
+              }}
+            >
+              예
+            </button>
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              아니오
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     <footer className='bg-gray-100 dark:bg-gray-900 py-6 mt-12'>
       <div className='container mx-auto text-center text-gray-600 dark:text-gray-400'>
         <p>&copy;{new Date().getFullYear()} 돌려돌려 LP판 | All rights reserved.</p>
@@ -130,12 +167,12 @@ const HomeLayout = () => {
 
       </div>
     </footer>
-        <button
-      onClick={() => navigate("/create")}
-      className="fixed bottom-20 right-20 z-80 bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-blue-700 transition"
-    >
-      +
-    </button>
+        <FloatingButton onClick={() => setIsModalOpen(true)} />
+        <LpWriteModal
+        open={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
+
     </div>
   );
 };

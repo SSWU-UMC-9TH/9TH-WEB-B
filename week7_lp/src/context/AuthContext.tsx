@@ -1,4 +1,3 @@
-import { postLogout } from "../apis/auth";
 import { LOCAL_STORAGE_KEY } from "../constants/key";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { createContext, useContext, useState, type PropsWithChildren } from "react";
@@ -6,13 +5,11 @@ import { createContext, useContext, useState, type PropsWithChildren } from "rea
 interface AuthContextType {
     accessToken: string | null;
     refreshToken: string | null;
-    logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
     accessToken: null,
     refreshToken: null,
-    logout: async () => {},
 })
 
 export const AuthProvider = ({children}: PropsWithChildren) => {
@@ -34,28 +31,8 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         getRefreshTokenFromStorage(),
     );
 
-    const logout = async () => {
-        try {
-            await postLogout();
-            removeAccessTokenFromStorage();
-            removeRefreshTokenFromStorage();
-
-            setAccessToken(null);
-            setRefreshToken(null);
-
-            alert("로그아웃 성공")
-        } catch(error) {
-            console.log("로그아웃 오류", error);
-            alert("로그아웃 실패");
-        } finally {
-            removeAccessTokenFromStorage();
-            removeRefreshTokenFromStorage();
-            setAccessToken(null);
-            setRefreshToken(null);
-        }
-    }
     return (
-        <AuthContext.Provider value={{accessToken, refreshToken, logout}}>
+        <AuthContext.Provider value={{accessToken, refreshToken}}>
             {children}
         </AuthContext.Provider>
     )

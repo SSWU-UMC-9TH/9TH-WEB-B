@@ -28,11 +28,6 @@ const MyPage = () => {
         }
         getData();
     }, []);
-
-    const handleLogout = async () => {
-        await logout();
-        navigate('/');
-    }
     
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -111,12 +106,6 @@ const MyPage = () => {
                     className='border border-white text-white rounded-lg p-2'
                 />
                 <p>{email}</p>
-                <button 
-                    className='cursor-pointer bg-blue-300 rounded-sm p-5 hover:scale-90'
-                    onClick={handleLogout}
-                >
-                    로그아웃
-                </button>
             </div>
         </div>
     )

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import type { ResponseMyInfoDto } from '../types/auth';
 import { getMyInfo } from '../apis/auth';
 import Search from '../assets/search.png';
+import { usePostLogout } from '../hooks/mutations/usePostLogout';
 
 interface NavbarProps {
     onSidebarClick: () => void;
@@ -11,12 +12,13 @@ interface NavbarProps {
 
 const Navbar = ({onSidebarClick}: NavbarProps) => {
     const navigate = useNavigate();
-    const { accessToken, logout } = useAuth();
+    const { accessToken } = useAuth();
     const [data, setData] = useState<ResponseMyInfoDto>([]);
 
+    const {mutate: postLogoutMutate} = usePostLogout();
+
     const handleLogout = async () => {
-        await logout();
-        navigate('/');
+        postLogoutMutate();
     }
 
     useEffect(() => {

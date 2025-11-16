@@ -96,7 +96,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const logout = async () => {
     try {
       await postLogout();
-      alert("로그아웃 성공")
     } catch (error) {
       console.error('로그아웃 API 실패:', error);
     } finally {

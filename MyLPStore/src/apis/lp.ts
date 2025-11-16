@@ -1,5 +1,5 @@
 import { PaginationDto, CommonResponse } from "../types/commons";
-import { Lp, ResponseLpListDto } from "../types/lp";
+import { Lp, ResponseLpListDto, CreateLpDto } from "../types/lp";
 import { axiosInstance } from "./axios";
 
 export const getLpList = async (paginationDto: PaginationDto): Promise<ResponseLpListDto> => {
@@ -16,4 +16,16 @@ export const getLpDetail = async (lpId: number): Promise<Lp> => {
 
 export const deleteLp = async (lpId: number): Promise<void> => {
     await axiosInstance.delete(`/v1/lps/${lpId}`);
-}; 
+};
+
+export const PostLP = async (createLpDto: CreateLpDto): Promise<Lp> => {
+    const { data } = await axiosInstance.post<CommonResponse<Lp>>('/v1/lps', createLpDto);
+    return data.data;
+};
+
+export const patchLP = async (lpId: number, updateLpDto: CreateLpDto): Promise<Lp> => {
+    const { data } = await axiosInstance.patch<CommonResponse<Lp>>(`/v1/lps/${lpId}`, updateLpDto);
+    return data.data;
+};
+
+

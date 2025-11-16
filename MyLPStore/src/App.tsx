@@ -54,7 +54,17 @@ const protectedRoutes: RouteObject[] = [
 
 const router = createBrowserRouter([...publicRouter, ...protectedRoutes]);
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false, // 자동 재시도 비활성화
+      refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 재요청 비활성화
+    },
+    mutations: {
+      retry: false, // 뮤테이션도 자동 재시도 비활성화
+    },
+  },
+});
 function App() {
   return (
     <QueryClientProvider client={queryClient}>

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
+import { useLogout } from '../hooks/mutations/useLogout';
 
 interface NavBarProps {
   onToggleSidebar?: () => void;
@@ -7,7 +8,8 @@ interface NavBarProps {
 
 const NavBar = ({ onToggleSidebar }: NavBarProps) => {
     const navigate = useNavigate();
-    const { accessToken, userInfo, logout } = useAuth();
+    const { accessToken, userInfo } = useAuth();
+    const logoutMutation = useLogout();
 
     // 복잡한 로직 완전 제거, AuthContext에서 모든 상태 관리 처리
     const handleLogin = () => {
@@ -22,9 +24,8 @@ const NavBar = ({ onToggleSidebar }: NavBarProps) => {
         navigate('/signup');
     };
 
-    const handleLogout = async () => {
-        await logout();
-        navigate('/');
+    const handleLogout = () => {
+        logoutMutation.mutate();
     };
 
     return (
@@ -70,7 +71,8 @@ const NavBar = ({ onToggleSidebar }: NavBarProps) => {
                             </span>
                             <button
                                 onClick={handleLogout}
-                                className="cursor-pointer hover:text-pink-400"
+                                disabled={logoutMutation.isPending}
+                                className="cursor-pointer hover:text-pink-400 disabled:opacity-50"
                             >
                                 로그아웃
                             </button>

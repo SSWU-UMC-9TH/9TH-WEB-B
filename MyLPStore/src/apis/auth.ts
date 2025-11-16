@@ -23,9 +23,9 @@ export const getMyInfo = async() : Promise<ResponseMyInfoDto> => {
     return data;
 };
 
-export const updateMyInfo = async (data: RequestUpdateMyInfoDto): Promise<ResponseMyInfoDto> => {
-    const response = await axiosInstance.patch<ResponseMyInfoDto>("/v1/users", data);
-    return response.data;
+export const updateMyInfo = async (body: RequestUpdateMyInfoDto): Promise<ResponseMyInfoDto> => {
+    const { data } = await axiosInstance.patch<ResponseMyInfoDto>("/v1/users", body);
+    return data;
 };
 
 export const postLogout=async()=>{

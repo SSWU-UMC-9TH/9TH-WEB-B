@@ -25,6 +25,19 @@ const Mypage = () => {
   }, []);
 
   const updateUserMutation = useMutation({
+  onMutate: async ({ name, bio }) => {
+    await Promise.resolve();
+
+    const previousUser = user;
+
+    setUser((prev: any) => ({
+      ...prev,
+      name,
+      bio,
+    }));
+
+    return { previousUser };
+  },
   mutationFn: async ({ name, bio }: { name: string; bio: string }) => {
     const body = {
       name,
@@ -48,8 +61,11 @@ const Mypage = () => {
     setIsEditing(false);
   },
 
-  onError: (error) => {
+  onError: (error, _variables, context) => {
     console.error("프로필 수정 실패:", error);
+    if (context?.previousUser) {
+      setUser(context.previousUser);
+    }
     alert("프로필 수정에 실패했습니다. 다시 시도해주세요.");
   },
 });

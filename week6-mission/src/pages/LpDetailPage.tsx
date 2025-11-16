@@ -31,9 +31,66 @@ const LpDetailPage = () => {
       return data;
     },
     onSuccess: async (data) => {
-  queryClient.setQueryData([QUERY_KEYS.lps, lpid], () => data.data);
-  setIsEditing(false);
-},
+      queryClient.setQueryData([QUERY_KEYS.lps, lpid], () => data.data);
+      setIsEditing(false);
+    },
+  });
+
+  const toggleLikeMutation = useMutation({
+    mutationFn: async ({ id, alreadyLiked }: { id: number; alreadyLiked: boolean }) => {
+      if (!alreadyLiked) {
+        // 좋아요 추가 (POST)
+        await axios.post(
+          `${import.meta.env.VITE_SERVER_API_URL}/v1/lps/${id}/likes`
+        );
+      } else {
+        // 좋아요 취소 (DELETE)
+        await axios.delete(
+          `${import.meta.env.VITE_SERVER_API_URL}/v1/lps/${id}/likes`
+        );
+      }
+      return true;
+    },
+
+    onMutate: async ({ id, alreadyLiked }: { id: number; alreadyLiked: boolean }) => {
+      await Promise.resolve();
+
+      const previousLp = queryClient.getQueryData([QUERY_KEYS.lps, lpid]);
+
+      queryClient.setQueryData([QUERY_KEYS.lps, lpid], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        const isLiked = alreadyLiked;
+
+        return {
+          ...oldData,
+          likes: isLiked
+            ? oldData.likes.filter(
+                (like: any) => like.userId !== oldData.currentUserId
+              )
+            : [
+                ...oldData.likes,
+                { userId: oldData.currentUserId, lpId: oldData.id },
+              ],
+        };
+      });
+
+      return { previousLp };
+    },
+
+    onError: (_err, _variables, context) => {
+      if (context?.previousLp) {
+        queryClient.setQueryData(
+          [QUERY_KEYS.lps, lpid],
+          context.previousLp
+        );
+      }
+      alert("좋아요 처리에 실패했습니다.");
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.lps, lpid] });
+    },
   });
 
   const {
@@ -115,8 +172,17 @@ const LpDetailPage = () => {
         </article>
 
         <div className="flex justify-center mt-6">
-          <button className="flex items-center gap-1 hover:text-blue-500 transition">
-            <span className="text-3xl">❤️</span> <span>{lp.likes.length}</span>
+          <button
+            className="flex items-center gap-1 hover:text-blue-500 transition"
+            onClick={() =>
+              toggleLikeMutation.mutate({
+                id: lp.id,
+                alreadyLiked: lp.likes.some((like: any) => like.userId === lp.currentUserId),
+              })
+            }
+          >
+            <span className="text-3xl">❤️</span>
+            <span>{lp.likes.length}</span>
           </button>
         </div>
       </div>

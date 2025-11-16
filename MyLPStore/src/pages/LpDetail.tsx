@@ -5,15 +5,18 @@ import { useGetInfiniteComments } from "../hooks/queries/useGetInfiniteComments"
 import { useGetLpDetail } from "../hooks/queries/useGetLpDetail";
 import { useDeleteLp } from "../hooks/mutations/useDeleteLp";
 import { useUpdateLp } from "../hooks/mutations/useUpdateLp";
+import { useLpLike } from "../hooks/mutations/useLpLike";
 import { PAGINATION_ORDER } from "../enums/common";
 import { CommentSkeleton } from "../components/Comment/CommentSkeleton";
 import usePostComment from "../hooks/mutations/usePostComment";
 import useEditComment from "../hooks/mutations/useEditComment";
 import useDeleteComment from "../hooks/mutations/useDeleteComment";
 import { uploadImage } from "../apis/upload";
+import { useAuth } from "../contexts/AuthContext";
 
 export const LpDetail = () => {
   const { lpid } = useParams();
+  const { userInfo } = useAuth();
   const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.desc);
   const [commentContent, setCommentContent] = useState("");
   
@@ -35,11 +38,10 @@ export const LpDetail = () => {
   // LP 상세 데이터 가져오기
   const { data: lpDetail, isLoading: lpLoading, error: lpError } = useGetLpDetail(lpid);
   
-  // LP 삭제 기능
+  // LP 기능들
   const deleteLpMutation = useDeleteLp();
-
-  // LP 수정 기능
   const updateLpMutation = useUpdateLp();
+  const likeMutation = useLpLike(lpid!);
 
   // 댓글 관련 mutation
   const postCommentMutation = usePostComment();
@@ -128,6 +130,21 @@ export const LpDetail = () => {
     }
   };
 
+  // 좋아요 토글 핸들러
+  const handleLikeToggle = () => {
+    if (!userInfo?.data?.id) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+    
+    // 현재 좋아요 상태를 매개변수로 전달
+    const isCurrentlyLiked = lpDetail?.likes?.some(like => like.userId === userInfo.data.id);
+    likeMutation.mutate(isCurrentlyLiked || false);
+  };
+
+  // 현재 사용자가 좋아요를 눌렀는지 확인
+  const isLiked = userInfo?.data?.id && lpDetail?.likes?.some(like => like.userId === userInfo.data.id);
+
   if (lpLoading) {
     return <div className="flex justify-center items-center min-h-screen bg-black text-white">로딩 중...</div>;
   }
@@ -192,9 +209,17 @@ export const LpDetail = () => {
           {/* 좋아요 */}
           <div className="flex justify-between items-center mb-6">
             <div></div> {/* 왼쪽 공간 */}
-            <button className="flex items-center pl-20 text-xl text-gray-300 hover:text-pink-400 transition-colors">
-                <span className="flex items-center">
-                  ❤️ {lpDetail.likes?.length || 0}
+            <button 
+              onClick={handleLikeToggle}
+              disabled={likeMutation.isPending}
+              className={`flex items-center pl-20 text-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                isLiked 
+                  ? 'text-pink-500 hover:text-pink-600' 
+                  : 'text-gray-300 hover:text-pink-400'
+              }`}
+            >
+                <span className="flex items-center cursor-pointer">
+                  {isLiked ? '❤️' : '🤍'} {lpDetail.likes?.length || 0}
                 </span>
             </button>
             <div className="flex items-center gap-3 text-sm text-gray-300">

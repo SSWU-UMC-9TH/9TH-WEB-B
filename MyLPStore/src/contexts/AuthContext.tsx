@@ -16,6 +16,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   getAccessToken: () => string | null;
   getRefreshToken: () => string | null;
+  updateUserInfo: (newUserInfo: Partial<ResponseMyInfoDto['data']>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -114,6 +115,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUserInfo(null);
   };
 
+  // 사용자 정보 즉시 업데이트 (optimistic update)
+  const updateUserInfo = (newUserInfo: Partial<ResponseMyInfoDto['data']>) => {
+    if (userInfo && userInfo.data) {
+      setUserInfo({
+        ...userInfo,
+        data: {
+          ...userInfo.data,
+          ...newUserInfo
+        }
+      });
+    }
+  };
+
   return (
     <AuthContext.Provider 
       value={{ 
@@ -124,7 +138,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         clearTokens: handleClearTokens,
         logout,
         getAccessToken, 
-        getRefreshToken 
+        getRefreshToken,
+        updateUserInfo
       }}
     >
       {children}

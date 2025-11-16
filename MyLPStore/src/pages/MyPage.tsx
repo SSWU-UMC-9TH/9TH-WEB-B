@@ -5,9 +5,11 @@ import { uploadImage } from '../apis/upload';
 import { ResponseMyInfoDto } from '../types/auth';
 import { useAuthStorage } from '../hooks/useAuthStorage';
 import { useUpdateMyInfo } from '../hooks/mutations/useUpdateMyInfo';
+import { useAuth } from '../contexts/AuthContext';
 
 const MyPage = () => {
     const navigate = useNavigate();
+    const { userInfo: contextUserInfo } = useAuth(); // AuthContext에서 사용자 정보 가져오기
     const [userInfo, setUserInfo] = useState<ResponseMyInfoDto['data'] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -30,9 +32,14 @@ const MyPage = () => {
                     return;
                 }
 
-                const response = await getMyInfo();
-                if (response.status) {
-                    setUserInfo(response.data);
+                // AuthContext에 사용자 정보가 있으면 우선 사용
+                if (contextUserInfo?.data) {
+                    setUserInfo(contextUserInfo.data);
+                } else {
+                    const response = await getMyInfo();
+                    if (response.status) {
+                        setUserInfo(response.data);
+                    }
                 }
             } catch (error) {
                 console.error('사용자 정보 조회 에러:', error);
@@ -43,7 +50,7 @@ const MyPage = () => {
         };
 
         fetchUserInfo();
-    }, [navigate]);
+    }, [navigate, contextUserInfo]);
 
     // 저장 버튼 클릭 - updateMyInfo 실행
     const handleSave = async () => {
@@ -75,18 +82,15 @@ const MyPage = () => {
 
             console.log("전송할 데이터:", updateData);
 
-            // 프로필 정보 업데이트
+            // 프로필 정보 업데이트 (onMutate를 통해 즉시 UI 업데이트됨)
             updateMyInfoMutation.mutate(updateData, {
                 onSuccess: (response) => {
                     console.log("수정 성공! 응답:", response);
                     
-                    // 서버에서 받은 최신 데이터로 즉시 UI 업데이트
+                    // 서버에서 받은 최신 데이터로 로컬 상태도 업데이트
                     if (response && response.status && response.data) {
                         setUserInfo(response.data);
                         alert('프로필이 수정되었습니다!');
-                    } else {
-                        alert('프로필 수정이 완료되었지만 화면 업데이트에 문제가 있었습니다.');
-                        window.location.reload();
                     }
                     
                     setIsEditOpen(false);

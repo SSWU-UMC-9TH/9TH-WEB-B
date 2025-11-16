@@ -28,4 +28,12 @@ export const patchLP = async (lpId: number, updateLpDto: CreateLpDto): Promise<L
     return data.data;
 };
 
+export const addLpLike = async (lpId: number): Promise<void> => {
+    await axiosInstance.post(`/v1/lps/${lpId}/likes`);
+};
+
+export const removeLpLike = async (lpId: number): Promise<void> => {
+    await axiosInstance.delete(`/v1/lps/${lpId}/likes`);
+};
+
 

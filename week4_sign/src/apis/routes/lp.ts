@@ -63,14 +63,19 @@ export const getUserLpList = async (
   }
 };
 
-// LP 생성 (실제 백엔드 API)
-export const createLp = async (data: CreateLpRequest): Promise<CreateLpResponse> => {
+// LP 생성 (실제 백엔드 API, 파일 없이)
+// FormData 지원 (파일+텍스트 동시 전송)
+export const createLp = async (data: FormData | CreateLpRequest): Promise<CreateLpResponse> => {
   try {
-    console.log('LP 생성 요청:', data);
-    
-    const response = await axiosInstance.post('/v1/lps', data);
+    let response;
+    if (data instanceof FormData) {
+      response = await axiosInstance.post('/v1/lps', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+    } else {
+      response = await axiosInstance.post('/v1/lps', data);
+    }
     console.log('LP 생성 API 응답:', response.data);
-    
     return response.data;
   } catch (error) {
     console.error('LP 생성 실패:', error);

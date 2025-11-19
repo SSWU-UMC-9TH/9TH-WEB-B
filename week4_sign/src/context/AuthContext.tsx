@@ -80,7 +80,7 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
                     name: payload?.name ?? payload?.data?.name,
                     email: signinData.email
                 };
-                setStorageItem('userData', JSON.stringify(userData));
+                setStorageItem(LOCAL_STORAGE_KEY.userData, JSON.stringify(userData));
 
                 setAccessToken(newAccessToken);
                 setRefreshToken(newRefreshToken);

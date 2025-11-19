@@ -1,5 +1,9 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { deleteMe } from '../apis/routes/deleteMe';
 import { NavLink } from 'react-router-dom';
+import ConfirmModal from './ConfirmModal';
 import { FiHome, FiSearch, FiUser } from 'react-icons/fi';
 
 interface SidebarProps {
@@ -10,9 +14,34 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const menuItems = [
     { path: '/', icon: FiHome, label: '홈' },
-    { path: '/lps', icon: FiSearch, label: 'LP 찾기' },
+    { path: '/search', icon: FiSearch, label: '찾기' },
     { path: '/mypage', icon: FiUser, label: '마이페이지' }
   ];
+
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const navigate = useNavigate();
+  const withdrawMutation = useMutation({
+    mutationFn: deleteMe,
+    onSuccess: () => {
+      // 탈퇴 성공 시 로그인 페이지로 이동
+      navigate('/login');
+    },
+    onError: (error: any) => {
+      let msg = '탈퇴에 실패했습니다.';
+      if (error && error.response) {
+        msg += '\n서버 응답: ' + JSON.stringify(error.response.data || error.response, null, 2);
+        console.error('서버 응답:', error.response);
+      } else if (error && error.request) {
+        msg += '\n요청 자체 실패: ' + JSON.stringify(error.request, null, 2);
+        console.error('요청 자체 실패:', error.request);
+      } else {
+        msg += '\n기타 에러: ' + String(error);
+        console.error('기타 에러:', error);
+      }
+      alert(msg);
+      console.error('❌ 탈퇴 실패:', error);
+    },
+  });
 
   return (
     <>
@@ -75,11 +104,40 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </NavLink>
           ))}
         </nav>
+        {/* 탈퇴하기 버튼 */}
+        <button
+          style={{
+            margin: '24px',
+            padding: '12px',
+            background: '#dc2626',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontWeight: 600,
+            fontSize: '16px',
+            cursor: 'pointer',
+            marginTop: 'auto'
+          }}
+          onClick={() => setShowWithdrawModal(true)}
+        >
+          탈퇴하기
+        </button>
       </div>
+      {/* 탈퇴 확인 모달 */}
+      <ConfirmModal
+        isOpen={showWithdrawModal}
+        onClose={() => setShowWithdrawModal(false)}
+        onConfirm={() => {
+          withdrawMutation.mutate();
+        }}
+        isPending={withdrawMutation.isPending}
+        message="정말로 회원 탈퇴하시겠습니까? 모든 데이터가 삭제됩니다."
+        confirmText="예"
+        cancelText="아니오"
+      />
     </>
   );
 };
 
 export default Sidebar;
-
 

@@ -24,7 +24,6 @@ export interface CommentListResponse {
 
 export interface CreateCommentRequest {
   content: string;
-  lpId: string;
 }
 
 export interface CreateCommentResponse {

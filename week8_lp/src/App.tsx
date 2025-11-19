@@ -15,6 +15,7 @@ import LpDetailPage from './pages/LpDetailPage'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedLayout from './layouts/ProtectedLayout'
 import GoogleLoginRedirectPage from './pages/GoogleLoginRedirectPage'
+import ThrottlePage from './pages/ThrottlePage'
 
 // publicRoutes: 인증 없이 접근 가능한 라우트
 const publicRoutes: RouteObject[] = [
@@ -29,6 +30,7 @@ const publicRoutes: RouteObject[] = [
             {path: 'signup2', element: <SignupPage2 />},
             {path: 'signup3', element: <SignupPage3 />},
             {path: 'v1/auth/google/callback', element: <GoogleLoginRedirectPage />},
+            {path: 'throttle', element: <ThrottlePage />},
         ]
     }
 ];
@@ -72,7 +74,7 @@ function App() {
             <AuthProvider>
                 <RouterProvider router={router} />
             </AuthProvider>
-            {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+            {/* {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />} */}
         </QueryClientProvider>
     )
 }

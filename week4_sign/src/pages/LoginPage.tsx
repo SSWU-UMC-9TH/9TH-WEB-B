@@ -1,6 +1,8 @@
 ﻿import useForm from '../hooks/useForm';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { postSignin } from '../apis/auth';
+import { LOCAL_STORAGE_KEY as ROUTE_LOCAL_STORAGE_KEY } from '../apis/routes/LOCAL_STORAGE_KEY';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { postLogout } from '../apis/auth';
@@ -15,6 +17,17 @@ const LoginPage = () => {
     // 로그인 useMutation
     const loginMutation = useMutation({
         mutationFn: async ({ email, password }: { email: string; password: string }) => {
+            // 실제 로그인 요청
+            const res = await postSignin({ email, password });
+            // accessToken, refreshToken 저장
+            const payload = (res as any)?.data ?? res;
+            const accessToken = payload?.accessToken ?? payload?.data?.accessToken;
+            const refreshToken = payload?.refreshToken ?? payload?.data?.refreshToken;
+            if (accessToken && refreshToken) {
+                localStorage.setItem(ROUTE_LOCAL_STORAGE_KEY.accessToken, accessToken);
+                localStorage.setItem(ROUTE_LOCAL_STORAGE_KEY.refreshToken, refreshToken);
+            }
+            // 기존 AuthContext login도 호출(사용자 정보 등)
             await login({ email, password });
         },
         onError: (e: any) => {

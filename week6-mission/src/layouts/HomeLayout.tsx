@@ -147,7 +147,7 @@ const [isModalOpen, setIsModalOpen] = useState(false);
               예
             </button>
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded"
+              className="px-4 py-2 bg-blue완전성보다 정확성을 중시하며, 번역이 사람 수준에 얼마나 가까운지를 평가하는 데 매우 효과적인 지표완전성보다 정확성을 중시하며, 번역이 사람 수준에 얼마나 가까운지를 평가하는 데 매우 효과적인 지표완전성보다 정확성을 중시하며, 번역이 사람 수준에 얼마나 가까운지를 평가하는 데 매우 효과적인 지표-500 text-white rounded"
               onClick={() => setIsDeleteModalOpen(false)}
             >
               아니오

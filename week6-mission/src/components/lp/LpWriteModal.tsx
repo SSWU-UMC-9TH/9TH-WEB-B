@@ -7,9 +7,9 @@ interface LpWriteModalProps {
 }
 
 const LpWriteModal = ({ open, onClose }: LpWriteModalProps) => {
-    const [title, setTitle] = useState("");
-const [content, setContent] = useState("");
-    const { mutate: createLp } = useCreateLp(onClose);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const { mutate: createLp } = useCreateLp(onClose);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string>(lpimg);
   const [tagInput, setTagInput] = useState("");

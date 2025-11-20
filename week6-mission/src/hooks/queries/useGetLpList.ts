@@ -1,27 +1,32 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import type { PaginationDto } from "../../types/common";
 import { getLpList } from "../../apis/lp";
 import { QUERY_KEYS } from "../../constants/key";
 
-function useGetLpList({cursor, limit, search, order}:PaginationDto){
-    return useQuery({
-        queryKey:[QUERY_KEYS.lps,search, order],
-        queryFn:() => 
-            getLpList({
-                cursor,
-                limit,
-                search,
-                order,
-            }),
-            
-            staleTime: 1000 * 60 * 5, // 5분
-            gcTime:1000 * 60 * 10, // 10분
 
-            //enabled:Boolean(search),
-            //retry:3,
+type UseGetLpListProps = Omit<PaginationDto, "cursor">;
 
-            select:(data) => data.data,
-            
-    });
+function useGetLpList({ limit, search, order }: UseGetLpListProps) {
+  return useInfiniteQuery({
+    queryKey: [QUERY_KEYS.lps, search, order],
+
+    queryFn: ({ pageParam }) =>
+      getLpList({
+        cursor: pageParam,
+        limit,
+        search,
+        order,
+      }),
+
+    initialPageParam: undefined as number | undefined,
+
+    getNextPageParam: (lastPage) => {
+      return lastPage.data.hasNext ? lastPage.data.nextCursor : undefined;
+    },
+
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+  });
 }
+
 export default useGetLpList;

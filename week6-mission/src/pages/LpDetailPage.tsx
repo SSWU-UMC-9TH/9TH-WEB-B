@@ -1,7 +1,9 @@
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { QUERY_KEYS } from "../constants/key";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const getLpDetail = async (lpid: string) => {
   const { data } = await axios.get(
@@ -11,14 +13,92 @@ const getLpDetail = async (lpid: string) => {
 };
 
 const LpDetailPage = () => {
+  const navigate = useNavigate();   
+
   const { lpid } = useParams<{ lpid: string }>();
+
+  const queryClient = useQueryClient();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+
+  const updateLpMutation = useMutation({
+    mutationFn: async ({ id, title }: { id: number; title: string }) => {
+      const { data } = await axios.patch(
+        `${import.meta.env.VITE_SERVER_API_URL}/v1/lps/${id}`,
+        { title }
+      );
+      return data;
+    },
+    onSuccess: async (data) => {
+      queryClient.setQueryData([QUERY_KEYS.lps, lpid], () => data.data);
+      setIsEditing(false);
+    },
+  });
+
+  const toggleLikeMutation = useMutation({
+    mutationFn: async ({ id, alreadyLiked }: { id: number; alreadyLiked: boolean }) => {
+      if (!alreadyLiked) {
+        // 좋아요 추가 (POST)
+        await axios.post(
+          `${import.meta.env.VITE_SERVER_API_URL}/v1/lps/${id}/likes`
+        );
+      } else {
+        // 좋아요 취소 (DELETE)
+        await axios.delete(
+          `${import.meta.env.VITE_SERVER_API_URL}/v1/lps/${id}/likes`
+        );
+      }
+      return true;
+    },
+
+    onMutate: async ({ id, alreadyLiked }: { id: number; alreadyLiked: boolean }) => {
+      await Promise.resolve();
+
+      const previousLp = queryClient.getQueryData([QUERY_KEYS.lps, lpid]);
+
+      queryClient.setQueryData([QUERY_KEYS.lps, lpid], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        const isLiked = alreadyLiked;
+
+        return {
+          ...oldData,
+          likes: isLiked
+            ? oldData.likes.filter(
+                (like: any) => like.userId !== oldData.currentUserId
+              )
+            : [
+                ...oldData.likes,
+                { userId: oldData.currentUserId, lpId: oldData.id },
+              ],
+        };
+      });
+
+      return { previousLp };
+    },
+
+    onError: (_err, _variables, context) => {
+      if (context?.previousLp) {
+        queryClient.setQueryData(
+          [QUERY_KEYS.lps, lpid],
+          context.previousLp
+        );
+      }
+      alert("좋아요 처리에 실패했습니다.");
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.lps, lpid] });
+    },
+  });
 
   const {
     data,
     isPending,
     isError,
   } = useQuery({
-    queryKey: [QUERY_KEYS.lps, lpid], // ✅ 키에 lpid 포함
+    queryKey: [QUERY_KEYS.lps, lpid],
     queryFn: () => getLpDetail(lpid as string),
     enabled: !!lpid,
     staleTime: 1000 * 60 * 5,
@@ -39,25 +119,46 @@ const LpDetailPage = () => {
         {/* 상단: 제목 + 작성자 + 날짜 + 버튼 */}
         <header className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">{lp.title}</h1>
+            {isEditing ? (
+              <input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="w-130 p-2 rounded bg-white text-black border border-gray-400"
+                autoFocus
+              />
+            ) : (
+              <h1 className="text-4xl font-bold mb-2">{lp.title}</h1>
+            )}
             <p className="text-sm text-gray-400">
               업로드일: {new Date(lp.createdAt).toLocaleDateString()}
             </p>
           </div>
 
-          {/* 수정/삭제/좋아요 버튼 */}
-          <div className="flex items-center gap-3 text-gray-300">
-            <button className="hover:text-blue-400 transition">
-              ✏️ 수정
+          <div className="flex items-center gap-4 text-gray-300 flex-row whitespace-nowrap">
+            <button
+              className="hover:text-blue-400 transition"
+              onClick={() => {
+                if (!isEditing) {
+                  setIsEditing(true);
+                  setEditTitle(lp.title);
+                } else {
+                  updateLpMutation.mutate({ id: lp.id, title: editTitle });
+                }
+              }}
+            >
+              {isEditing ? "✔️" : "✏️"}
             </button>
-            <button className="hover:text-blue-500 transition">
-              🗑 삭제
+            <button className="hover:text-blue-500 transition">🗑️</button>
+
+            <button
+              onClick={() => navigate(`/lps/${lp.id}/comments`)}
+              className="hover:text-blue-400 transition"
+            >
+              댓글보기
             </button>
-            
           </div>
         </header>
 
-        {/* 썸네일 */}
         <div className="mb-6 flex justify-center">
           <img
             src={lp.thumbnail}
@@ -66,13 +167,22 @@ const LpDetailPage = () => {
           />
         </div>
 
-        {/* 본문 */}
         <article className="whitespace-pre-wrap text-gray-300 leading-relaxed border-t border-gray-700 pt-6">
           {lp.content}
         </article>
+
         <div className="flex justify-center mt-6">
-          <button className="flex items-center gap-1 hover:text-blue-500 transition">
-            <span className="text-3xl">❤️</span> <span>{lp.likes.length}</span>
+          <button
+            className="flex items-center gap-1 hover:text-blue-500 transition"
+            onClick={() =>
+              toggleLikeMutation.mutate({
+                id: lp.id,
+                alreadyLiked: lp.likes.some((like: any) => like.userId === lp.currentUserId),
+              })
+            }
+          >
+            <span className="text-3xl">❤️</span>
+            <span>{lp.likes.length}</span>
           </button>
         </div>
       </div>

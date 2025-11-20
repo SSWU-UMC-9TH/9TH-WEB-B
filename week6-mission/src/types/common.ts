@@ -5,13 +5,15 @@ export type CommonResponse<T>={
     data:T;
 }
 
-export type CommonCursorBasedResponse<T>={
-    status:boolean;
-    statusCode:number;
-    message:string;
-    data:T;
-    nextCursor: number;
-    hasNest: boolean;
+export type CommonCursorBasedResponse<T> = {
+    status: boolean;
+    statusCode: number;
+    message: string;
+    data: {
+        data: T;
+        nextCursor: number | null;
+        hasNext: boolean;
+    };
 };
 
 
@@ -21,4 +23,3 @@ export type PaginationDto={
     search?: string;
     order?: 'asc' | 'desc';
 };
-

@@ -1,55 +1,89 @@
 import { useNavigate } from "react-router-dom";
 import useGetLpList from "../hooks/queries/useGetLpList";
+import { useEffect, useRef, useState } from "react";
+import LpCardSkeletonList from "../components/LpCardSkeletonList";
+import LpCard from "../components/LpCard";
 
 const Homepage = () => {
   const navigate = useNavigate();
-  const { data, isPending } = useGetLpList({});
 
-  if (isPending) return <div className="mt-20 text-center">Loading...</div>;
+  const {
+    data,
+    isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useGetLpList({ limit: 20 });
+
+  const observerRef = useRef<HTMLDivElement>(null);
+
+  // 👇 스켈레톤 최소 노출 위한 state
+  const [showBottomSkeleton] = useState(false);
+
+
+
+  // 무한스크롤 옵저버
+  useEffect(() => {
+    if (!observerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          hasNextPage &&
+          !isFetchingNextPage
+        ) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(observerRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // 초기 로딩: 스켈레톤 전체 출력
+  if (isLoading) {
+    return (
+      <div className="mt-20 px-10 pb-10">
+        <LpCardSkeletonList count={20} />
+      </div>
+    );
+  }
+
+  // 데이터 평탄화
+  const lpList = data?.pages.flatMap((page) => page.data.data) ?? [];
 
   return (
-    <div className="mt-20 px-10">
+    <div className="mt-20 px-10 pb-10">
+      {/* LP 카드들 */}
       <div
-        className="
-          grid 
-          grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6
-          gap-3
-        "
-      >
-        {data?.data.map((lp) => (
-          <div
-            key={lp.id}
-            onClick={() => { navigate(`/lps/${lp.id}`); }} // 라우팅 연결
-            className="
-              relative group cursor-pointer
-              overflow-hidden rounded-md
-              hover:scale-105 transition-transform duration-300
-            "
-          >
-            {/* 썸네일 이미지 */}
-            <img
-              src={lp.thumbnail}
-              alt={lp.title}
-              className="w-full h-40 object-cover"
-            />
+  className="
+    grid 
+    grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6
+    gap-3
+  "
+>
+  {lpList.map((lp) => (
+    <LpCard
+      key={lp.id}
+      lp={lp}
+      onClick={() => navigate(`/lps/${lp.id}`)}
+    />
+  ))}
+</div>
+      
 
-            {/* Hover 오버레이 */}
-            <div
-              className="
-                absolute inset-0 bg-black/60 opacity-0 
-                group-hover:opacity-100 transition-opacity duration-300 
-                flex flex-col justify-end p-3 text-white
-              "
-            >
-              <p className="text-sm font-semibold line-clamp-2">{lp.title}</p>
-              <p className="text-xs text-gray-300">
-                {new Date(lp.createdAt).toLocaleDateString()}
-              </p>
-              <p className="text-xs text-gray-300">❤️ {lp.likes.length}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/*  무한스크롤 로딩 스켈레톤 (항상 위에 배치 + 최소시간 유지) */}
+      {showBottomSkeleton && (
+        <div className="mt-6">
+          <LpCardSkeletonList count={20} />
+        </div>
+      )}
+
+      {/* 옵저버 트리거 */}
+      <div ref={observerRef} className="h-10 w-full" />
     </div>
   );
 };

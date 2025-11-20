@@ -41,11 +41,12 @@ const Sidebar = ({isOpen, onClose}: SidebarProps) => {
                 ref={sidebarRef}
                 className={`h-full w-[250px] bg-[#161616] text-white p-4 
                     z-20 shadow-xl transition-all duration-300 flex-shrink-0
-                    fixed top-[80px] left-0
-                    
-                    ${isDesktop ? '' : (isOpen ? 'translate-x-0' : '-translate-x-full')}
-                    ${isDesktop && isOpen ? 'block' : isDesktop && !isOpen ? 'hidden' : ''}
-                    ${!isDesktop && !isOpen ? 'hidden' : 'block'}`}
+                    ${isDesktop
+                        ? 'relative top-0 left-0'
+                        : 'fixed top-[80px] left-0'
+                    } 
+                    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+                    `}
                     style={{ height: isDesktop ? '100%' : 'calc(100vh - 80px)' }}
             >
                 <button className='flex text-white p-[10px] cursor-pointer'>

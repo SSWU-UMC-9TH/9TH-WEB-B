@@ -21,8 +21,9 @@ const usePostComment = () => {
         onSuccess: (_data, variables) => {
             console.log("댓글 작성 성공 → 쿼리 무효화 실행", variables);
 
+            // comments 관련된 모든 infinite query 무효화
             queryClient.invalidateQueries({
-                queryKey: [QUERY_KEY.comments, variables.lpId, variables.order],
+                queryKey: [QUERY_KEY.comments],
             });
         },
         onError: (error, variables) => {
@@ -30,6 +31,7 @@ const usePostComment = () => {
         },
     });
 };
+
 
 export default usePostComment;
 

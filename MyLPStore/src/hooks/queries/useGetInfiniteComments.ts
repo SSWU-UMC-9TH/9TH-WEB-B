@@ -10,7 +10,7 @@ export const useGetInfiniteComments = (
   order: PAGINATION_ORDER
 ) => {
   return useInfiniteQuery<CommentsListData>({
-    queryKey: [QUERY_KEY.comments, lpId, order],
+    queryKey: [QUERY_KEY.comments, { lpId, order }],
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       getComments(lpId!, {

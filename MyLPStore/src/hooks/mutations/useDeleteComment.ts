@@ -18,9 +18,9 @@ export default function useDeleteComment() {
 
   return useMutation({
     mutationFn: deleteComment,
-    onSuccess: (_data, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEY.comments, variables.lpId, variables.order],
+        queryKey: [QUERY_KEY.comments],
       });
     },
   });

@@ -20,12 +20,12 @@ const useEditComment = () => {
 
   return useMutation({
     mutationFn: editComment,
-    onSuccess: (_data, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEY.comments, variables.lpId, variables.order ?? PAGINATION_ORDER.desc],
+        queryKey: [QUERY_KEY.comments],
       });
     },
   });
-};
+}
 
 export default useEditComment;

@@ -1,8 +1,8 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { axiosInstance } from "../../apis/axios";
 import { PAGINATION_ORDER } from "../../enums/common";
-import { CommentsListData, CommentsResponse } from "../../types/comment";
+import { CommentsListData } from "../../types/comment";
 import { QUERY_KEY } from "../../constants/key";
+import { getComments } from "../../apis/comment";
 
 export const useGetInfiniteComments = (
   lpId: string | undefined,
@@ -10,21 +10,14 @@ export const useGetInfiniteComments = (
   order: PAGINATION_ORDER
 ) => {
   return useInfiniteQuery<CommentsListData>({
-    queryKey: [QUERY_KEY.comments, lpId, order],
+    queryKey: [QUERY_KEY.comments, { lpId, order }],
     initialPageParam: 0,
-    queryFn: async ({ pageParam }) => {
-      const res = await axiosInstance.get<CommentsResponse>(
-        `/v1/lps/${lpId}/comments`,
-        {
-          params: {
-            cursor: pageParam,
-            limit,
-            order: order === PAGINATION_ORDER.asc ? 'asc' : 'desc',
-          },
-        }
-      );
-      return res.data.data;
-    },
+    queryFn: ({ pageParam }) =>
+      getComments(lpId!, {
+        cursor: pageParam as number,
+        limit,
+        order
+      }),
     enabled: !!lpId,
     getNextPageParam: (lastPage) => {
       console.log('getNextPageParam 체크:', {

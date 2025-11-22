@@ -4,10 +4,12 @@ import { PAGINATION_ORDER } from "../enums/common";
 import { useInView } from "react-intersection-observer";
 import { LpCard } from "../components/LpCard/LpCard";
 import { useNavigate } from "react-router-dom";
+import { LpCreateModal } from "../components/LpCreateModal/LpCreateModal";
 
 const HomePage = () => {
   const [search, setSearch] = useState("");
   const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.desc);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -66,6 +68,33 @@ const HomePage = () => {
             </div>
           ))}
       </div>
+
+      {/* LP 생성 플로팅 버튼 */}
+      <button 
+        onClick={() => setIsModalOpen(true)}
+        className="fixed bottom-6 right-6 w-14 h-14 bg-pink-500 hover:bg-pink-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center z-10 group"
+        aria-label="LP 생성"
+      >
+        <svg 
+          className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={2} 
+            d="M12 4v16m8-8H4" 
+          />
+        </svg>
+      </button>
+
+      {/* LP 생성 모달 */}
+      <LpCreateModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
 
       {/* 무한 스크롤 트리거 */}
       <div ref={ref} className="h-10"></div>

@@ -8,10 +8,11 @@ import { FiHome, FiSearch, FiUser } from 'react-icons/fi';
 
 interface SidebarProps {
   isOpen: boolean;
-  onClose: () => void;
+  close: () => void;
+  children?: React.ReactNode;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, close, children }) => {
   const menuItems = [
     { path: '/', icon: FiHome, label: '홈' },
     { path: '/search', icon: FiSearch, label: '찾기' },
@@ -48,7 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          onClick={onClose}
+          onClick={close}
           style={{
             position: 'fixed',
             top: 0,
@@ -78,13 +79,33 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           flexDirection: 'column',
           padding: '20px 0'
         }}
+        role="dialog"
+        aria-modal="true"
+        tabIndex={-1}
       >
+        <button
+          className="absolute top-4 right-4"
+          onClick={close}
+          aria-label="사이드바 닫기"
+          style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            background: 'none',
+            border: 'none',
+            color: '#9ca3af',
+            fontSize: '24px',
+            cursor: 'pointer'
+          }}
+        >
+          &times;
+        </button>
         <nav style={{ flex: 1 }}>
           {menuItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
-              onClick={() => window.innerWidth < 768 && onClose()}
+              onClick={() => window.innerWidth < 768 && close()}
               style={({ isActive }) => ({
                 display: 'flex',
                 alignItems: 'center',

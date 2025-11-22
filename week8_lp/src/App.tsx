@@ -9,6 +9,7 @@ import LpDetailPage from "./pages/LpDetailPage";
 import LpCreatePage from "./pages/LpCreatePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import ThrottlePage from "./pages/ThrottlePage";
 import MyPage from "./pages/MyPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -75,6 +76,7 @@ function App() {
             <Route element={<PublicOnlyRoute />}>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
+              <Route path="/throttle" element={<ThrottlePage />} />
             </Route>
             
             {/* Main layout routes */}

@@ -3,17 +3,10 @@ import { Outlet } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import FloatingButton from '../components/FloatingButton';
+import { useSidebar } from '../hooks/useSidebar';
 
 const MainLayout: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-  };
+  const { isOpen, open, close, toggle } = useSidebar();
 
   return (
     <div style={{
@@ -22,17 +15,17 @@ const MainLayout: React.FC = () => {
       minHeight: '100vh',
       backgroundColor: '#000000'
     }}>
-      <Header onMenuToggle={toggleSidebar} />
+      <Header onMenuToggle={toggle} />
       
       <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
-        <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+        <Sidebar isOpen={isOpen} close={close} />
         
         <main style={{
           flex: 1,
           padding: '20px',
           backgroundColor: '#111111',
           overflow: 'auto',
-          marginLeft: window.innerWidth >= 768 && sidebarOpen ? '240px' : '0',
+          marginLeft: window.innerWidth >= 768 && isOpen ? '240px' : '0',
           transition: 'margin-left 0.3s ease',
           minHeight: 'calc(100vh - 60px)'
         }}>

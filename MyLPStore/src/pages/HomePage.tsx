@@ -7,6 +7,7 @@ import { LpCard } from "../components/LpCard/LpCard";
 import { useNavigate } from "react-router-dom";
 import { LpCreateModal } from "../components/LpCreateModal/LpCreateModal";
 import { FaSearch } from "react-icons/fa";
+import { useThrottle } from "../hooks/useThrottle";
 
 const HomePage = () => {
   const [searchInput, setSearchInput] = useState("");
@@ -40,14 +41,19 @@ const HomePage = () => {
   const isFetching = isSearching ? isFetchingSearch : isFetchingAll;
   const fetchNextPage = isSearching ? fetchNextSearch : fetchNextAll;
 
+  // fetchNextPage를 throttle로 감싸기 (500ms) - throttle 적용한 무한스크롤 => 500ms 동안 최대 1번만 fetchNextPage 실행됨
+  const throttledFetchNext = useThrottle(() => {
+    if (!isFetching && hasNextPage) {
+      fetchNextPage();
+    }
+  }, 500);
+
   // 무한스크롤
   const { ref, inView } = useInView({ threshold: 0.5 });
 
   useEffect(() => {
-    if (inView && hasNextPage && !isFetching) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, isFetching, fetchNextPage]);
+    if (inView) throttledFetchNext();
+  }, [inView, throttledFetchNext]);
 
   // LP 목록 평탄화 - 여러 페이지의 LP 데이터를 한 번에 화면에 보여주기 위해 평탄화(flatten)
   const lpPages = lps?.pages?.flatMap((p) => p.data.data) ?? [];

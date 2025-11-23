@@ -5,11 +5,12 @@ import { useInView } from 'react-intersection-observer';
 import LpCard from '../components/LpCard/LpCard';
 import LpCardSkeletonList from '../components/LpCard/LpCardSkeletonList';
 import useDebounce from '../hooks/useDebounce';
+import { SEARCH_DEBOUNCE_DELAY } from '../constants/delay';
 
 const HomePage = () => {
     const [search, setSearch] = useState("");
     const [order, setOrder] = useState(PAGINATION_ORDER.desc);
-    const debouncedValue = useDebounce(search, 300);
+    const debouncedValue = useDebounce(search, SEARCH_DEBOUNCE_DELAY);
     const {data: lps, isFetching, hasNextPage, isPending, fetchNextPage, isError} = useGetInfiniteLpList(10, debouncedValue, order);
 
     // ref: 특정한 HTML 요소를 감시할 수 있다

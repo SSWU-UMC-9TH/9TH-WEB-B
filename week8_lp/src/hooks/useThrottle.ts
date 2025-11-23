@@ -1,33 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from "react";
 
-/**
- * useThrottle 훅
- * @param value 스로틀링할 값 (제네릭)
- * @param delay 밀리초 단위 인터벌 (기본값 500ms)
- * @returns 스로틀링된 값
- */
-export function useThrottle<T>(value: T, delay: number = 500): T {
-  const [throttledValue, setThrottledValue] = useState<T>(value);
-  const lastExecRef = useRef<number>(Date.now());
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+export function useThrottle<T extends (...args: any[]) => void>(
+  callback: T,
+  delay: number
+): T {
+  const lastCall = useRef(0);
+  const savedCallback = useRef(callback);
 
   useEffect(() => {
-    const now = Date.now();
-    const timeSinceLastExec = now - lastExecRef.current;
-    if (timeSinceLastExec >= delay) {
-      setThrottledValue(value);
-      lastExecRef.current = now;
-    } else {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => {
-        setThrottledValue(value);
-        lastExecRef.current = Date.now();
-      }, delay - timeSinceLastExec);
-    }
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [value, delay]);
+    savedCallback.current = callback;
+  }, [callback]);
 
-  return throttledValue;
+  const throttledFn = useCallback(
+    ((...args: any[]) => {
+      const now = Date.now();
+      if (now - lastCall.current >= delay) {
+        lastCall.current = now;
+        savedCallback.current(...args);
+      }
+    }) as T,
+    [delay]
+  );
+
+  return throttledFn;
 }

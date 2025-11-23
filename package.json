@@ -2,6 +2,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
     "clsx": "^2.1.1",
+    "lodash": "^4.17.21",
     "vite": "^7.1.7"
   },
   "devDependencies": {

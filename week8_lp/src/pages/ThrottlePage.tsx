@@ -33,9 +33,9 @@ const ThrottlePage = () => {
     fetch('https://jsonplaceholder.typicode.com/todos/1')
       .then(res => res.json())
       .then(data => {
-        console.log('네트워크 요청 결과:', data);
+        console.log('[THROTTLE] 네트워크 요청 결과:', data, '시간:', new Date().toLocaleTimeString());
       });
-    console.log('쓰로틀링된 스크롤 이벤트! scrollY:', window.scrollY);
+    console.log('[THROTTLE] 쓰로틀링된 스크롤 이벤트! scrollY:', window.scrollY, '시간:', new Date().toLocaleTimeString());
   }, 2000);
 
   return (

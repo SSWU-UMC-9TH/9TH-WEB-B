@@ -67,6 +67,7 @@ const Sidebar = () => { // 기존의 props가 아니라 커스텀 훅의 함수�
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}
+        onClick={(e) => e.stopPropagation()} 
       >
         <nav className="px-1 py-6 space-y-6 mt-10">
           <Link to="/mypage" className="flex mt-5 ml-5 cursor-pointer">

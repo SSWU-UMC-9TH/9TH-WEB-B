@@ -5,13 +5,11 @@ import lpimg from "../assets/lpimg.png";
 import { useMutation } from "@tanstack/react-query";
 
 const Mypage = () => {
-  const [preview] = useState<string>(lpimg);
   const [user, setUser] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editBio, setEditBio] = useState("");
-  const [editImage, setEditImage] = useState<File | null>(null);
-
+  
   useEffect(() => {
     const getData = async () => {
       try {

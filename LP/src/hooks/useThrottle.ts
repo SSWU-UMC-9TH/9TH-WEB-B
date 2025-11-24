@@ -5,7 +5,7 @@ export function useThrottle<T>(value: T, interval: number): T {
 
   // 타이머 저장용 ref
   const lastExecuted = useRef<number>(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const now = Date.now();

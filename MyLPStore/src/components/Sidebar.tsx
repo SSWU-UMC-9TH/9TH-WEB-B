@@ -1,15 +1,37 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSignout } from "../hooks/mutations/useSignout";
+import { useSidebar } from "../contexts/SidebarContext";
 
-interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+const Sidebar = () => { // 기존의 props가 아니라 커스텀 훅의 함수를 사용
+  const { isOpen, close } = useSidebar(); 
   const [showSignoutModal, setShowSignoutModal] = useState(false);
   const signoutMutation = useSignout();
+
+  // ESC 키로 닫기
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        close();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    // 클린업 함수로 이벤트 해제
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, close]);
+
+  // 사이드바 열렸을 때 배경 스크롤 방지 - 따로 css에 "overflow: hidden"을 설정하지 않아도 tailwind에서 유틸리티 크래스에 전역으로 자동으로 추가해줌
+  useEffect(() => {
+  if (isOpen) {
+    document.body.classList.add("overflow-hidden");
+  } else {
+    document.body.classList.remove("overflow-hidden");
+  }
+  return () => {
+    document.body.classList.remove("overflow-hidden");
+  };
+}, [isOpen]);
 
   const handleSignoutClick = () => {
     setShowSignoutModal(true);
@@ -18,7 +40,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const handleConfirmSignout = () => {
     signoutMutation.mutate();
     setShowSignoutModal(false);
-    onClose();
+    close();
   };
 
   const handleCancelSignout = () => {
@@ -29,17 +51,23 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 z-20"
-          onClick={onClose}
+          className={`
+            fixed inset-0 z-20 bg-black/50
+            transition-opacity duration-300
+            ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}
+          `}
+          onClick={close}
         />
       )}
       
       <div
         className={`
-          fixed top-0 left-0 w-50 h-full bg-gray-800/70 text-white z-30
-          transform transition-transform duration-300
+          fixed top-0 left-0 h-full w-60
+          bg-gray-800 text-white z-30
+          transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}
+        onClick={(e) => e.stopPropagation()} 
       >
         <nav className="px-1 py-6 space-y-6 mt-10">
           <Link to="/mypage" className="flex mt-5 ml-5 cursor-pointer">

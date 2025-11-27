@@ -8,4 +8,5 @@ export const QUERY_KEY = {
     lp: "lp",
     comments: "comments",
     me: "me",
+    lpsTag: "lpsTag",
 };

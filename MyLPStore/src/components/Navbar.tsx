@@ -1,12 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
 import { useLogout } from '../hooks/mutations/useLogout';
+import { useSidebar } from "../contexts/SidebarContext";
 
-interface NavBarProps {
-  onToggleSidebar?: () => void;
-}
-
-const NavBar = ({ onToggleSidebar }: NavBarProps) => {
+const NavBar = () => {
+    const { toggle } = useSidebar();
     const navigate = useNavigate();
     const { accessToken, userInfo } = useAuth();
     const logoutMutation = useLogout();
@@ -33,7 +31,7 @@ const NavBar = ({ onToggleSidebar }: NavBarProps) => {
             <div className="flex items-center justify-between pr-5 pl-2 py-4">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={onToggleSidebar}
+                        onClick={toggle}
                         className="cursor-pointer p-2 rounded transition-colors"
                     >
                         <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">

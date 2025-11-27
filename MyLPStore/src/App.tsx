@@ -13,6 +13,7 @@ import MyPage from './pages/MyPage'
 import { ProtectedLayout } from './layouts/ProtectedLayout'
 import { GoogleLoginRedirectPage } from './pages/GoogleLoginRedirectPage'
 import { LpDetail } from './pages/LpDetail'
+import { SidebarProvider } from "./contexts/SidebarContext";
 
 const publicRouter: RouteObject[] = [
   {
@@ -69,7 +70,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+         <SidebarProvider>    
         <RouterProvider router={router} />
+        </SidebarProvider>
       </AuthProvider>
       {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>

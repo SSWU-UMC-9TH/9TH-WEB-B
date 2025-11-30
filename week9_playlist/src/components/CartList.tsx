@@ -5,13 +5,15 @@ const CartList = () => {
     const {cartItems, amount, total} = useSelector((state: CartState) => state.cart);
 
     return (
-        <div className='flex flex-col items-center justify-center'>
-            <ul>
-                {cartItems.map((item) => (
-                    <CardItem key={item.id} lp={item} />
-                ))}
-            </ul>
-        </div>
+        <>
+            <div className='flex flex-col items-center justify-center'>
+                <ul>
+                    {cartItems.map((item) => (
+                        <CardItem key={item.id} lp={item} />
+                    ))}
+                </ul>
+            </div>
+        </>
     )
 }
 

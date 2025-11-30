@@ -1,6 +1,6 @@
 import './App.css';
 import CartList from './components/CartList'; // CartList import 경로 수정
-import Navbar from './components/navbar';
+import Navbar from './components/Navbar';
 import React from 'react';
 import store from './store/store';
 import { Provider } from 'react-redux';

@@ -17,13 +17,11 @@ const ConfirmModal = () => {
   const handleYes = () => {
     if (deleteId) {
       dispatch(removeItem({ id: deleteId }));
-      dispatch(calculateTotals());
-      dispatch(closeModal());
     } else {
       dispatch(clearCart());
-      dispatch(calculateTotals());
-      dispatch(closeModal());
     }
+    dispatch(calculateTotals());
+    dispatch(closeModal());
   };
 
   return (

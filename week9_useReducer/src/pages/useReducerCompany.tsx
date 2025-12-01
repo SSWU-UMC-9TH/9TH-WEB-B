@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useReducer, useState } from 'react'
 
 type TActionType = 'CHANGE_DEPARTMENT' | 'RESET';
+
 interface IState {
     department: string;
     error: string | null;
@@ -43,7 +44,7 @@ const UseRedecerCompany = () => {
     };
 
     return (
-        <div className='mx-auto my-auto'>
+        <div>
             <h1>{state.department}</h1>
             {state.error && <p className='text-red-500 font-2xl'>{state.error}</p>}
             <input 
@@ -59,7 +60,7 @@ const UseRedecerCompany = () => {
             >
                 직무 변경하기
             </button>
-        </div>
+            </div>
     )
 }
 

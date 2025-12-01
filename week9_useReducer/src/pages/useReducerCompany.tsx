@@ -1,12 +1,13 @@
 import React, { ChangeEvent, useReducer, useState } from 'react'
 
+type TActionType = 'CHANGE_DEPARTMENT' | 'RESET';
 interface IState {
     department: string;
     error: string | null;
 }
 
 interface IAction {
-    type: 'CHANGE_DEPARTMENT' | 'RESET';
+    type: TActionType;
     payload?: string;
 }
 

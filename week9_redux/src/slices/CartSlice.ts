@@ -39,8 +39,8 @@ const cartSlice = createSlice({
       // 이 아이디를 통해서, 전체 음반 중에 내가 클릭한 음반을 찾기
       const item = state.cartItems.find((cartItem) => cartItem.id === itemId);
     
-      if (item) {
-        item.amount -= 1;
+      if (item && item.amount > 0) {
+      item.amount -= 1;
       }
     },
     // TODO: removeItem 아이템 제거 => 0이면 리스트에서 빠짐
